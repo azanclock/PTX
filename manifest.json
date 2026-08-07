@@ -9,7 +9,8 @@
     "storage",
     "notifications",
     "alarms",
-    "offscreen"
+    "offscreen",
+    "tabs"
   ],
   "host_permissions": [
     "https://smartazanclock.com/"

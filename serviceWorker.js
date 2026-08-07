@@ -801,6 +801,19 @@ function isAdhanAvailable() {
 }
 
 /* - - - - - - - - - - - - - - - - - */
+async function muteAllTabs() {
+    try {
+        const tabs = await chrome.tabs.query({});
+        for (const tab of tabs) {
+            if (!tab.mutedInfo || !tab.mutedInfo.muted) {
+                await chrome.tabs.update(tab.id, { muted: true });
+            }
+        }
+    } catch (e) {
+        console.log('Error muting tabs: ' + e.message);
+    }
+}
+
 async function callAdhan() {
     if (isAdhanAvailable()) {
         let callString = appData.timeNow24 + '-' + currentVakit.name + '-' + appData.currentVakitAdhanAudioID;
@@ -808,6 +821,8 @@ async function callAdhan() {
             console.log('Already called for ' + callString);
         }
         else {
+            /* mute all browser tabs before playing the adhan */
+            await muteAllTabs();
             await chrome.storage.local.set({ 'adhanStatus': { lastCall: callString, isBeingCalled: true } });
             await createOffscreen();
             await chrome.runtime.sendMessage({ audioID: appData.currentVakitAdhanAudioID, volume: appData.settings.volume });
