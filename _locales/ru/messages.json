@@ -146,5 +146,9 @@
   "copiedText": {
     "message": "Скопировано",
     "description": ""
+  },
+  "calcAngleUpdateNotice": {
+    "message": "Расчёт времени молитв для выбранного метода ({method}) обновлён для повышения точности. Все заданные вами вручную корректировки времени (смещения) сброшены на 0. Проверьте время молитв и заново задайте смещения только если они всё ещё нужны.",
+    "description": "One-time notice shown after v2.0.20 when a calculation method's angles changed and manual offsets were reset."
   }
 }

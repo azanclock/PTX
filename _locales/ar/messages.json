@@ -146,5 +146,9 @@
   "copiedText": {
     "message": "تم النسخ",
     "description": ""
+  },
+  "calcAngleUpdateNotice": {
+    "message": "تم تحديث حساب أوقات الصلاة للطريقة المختارة ({method}) لتحسين الدقة. تمت إعادة تعيين أي تعديلات زمنية يدوية (إزاحات) كنت قد ضبطتها إلى 0. يرجى مراجعة أوقات الصلاة وإعادة ضبط الإزاحات فقط إذا كنت لا تزال بحاجة إليها.",
+    "description": "One-time notice shown after v2.0.20 when a calculation method's angles changed and manual offsets were reset."
   }
 }

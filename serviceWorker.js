@@ -157,6 +157,19 @@ async function initUser(i18nValues, appData) {
             if (!appData.settings.volume) {
                 appData.settings.volume = 5;
             }
+
+            /* one-time (v2.0.20): twilight angles / method offsets for some calculation
+               methods were corrected. A manual offset dialed in to compensate the old
+               values would now double-correct the result, so reset offsets once for
+               affected users and leave a notice for the popup to surface. */
+            if (!appData.settings.calcAngleFixApplied) {
+                appData.settings.calcAngleFixApplied = true;
+                if (calcAngleUpdatedMethods.includes(appData.settings.calculationMethod)) {
+                    appData.settings.vakitOffsets = {};
+                    await chrome.storage.local.set({ calcAngleNotice: { method: appData.settings.calculationMethod } });
+                }
+            }
+
             await chrome.storage.local.set({ 'appData': appData });
             await initAlarm();
 
@@ -183,7 +196,8 @@ async function initUser(i18nValues, appData) {
                 showImsak: false,
                 showDuha: false,
                 showMidnight: false,
-                volume: 5
+                volume: 5,
+                calcAngleFixApplied: true
             }
             let appData = {
                 settings: settings,
@@ -216,7 +230,26 @@ async function initDefaultUser(i18nValues) {
     appData.settings.adhans = defaultAdhanSettings;
     appData.settings.areAdhansEnabled = false;
     appData.settings.volume = 5;
+    appData.settings.calcAngleFixApplied = true;
     await chrome.storage.local.set({ 'appData': appData });
+}
+
+/* TEMP (testing only — delete before release): clear the one-time calc-angle
+   migration guard and re-run it. Call from the service worker console: resetCalcAngleFix() */
+async function resetCalcAngleFix() {
+    const stored = (await chrome.storage.local.get('appData')).appData;
+    if (stored && stored.settings) delete stored.settings.calcAngleFixApplied;
+    await chrome.storage.local.set({ 'appData': stored });
+    await chrome.storage.local.remove('calcAngleNotice');
+    await start();
+    const after = await chrome.storage.local.get(['appData', 'calcAngleNotice']);
+    console.log('resetCalcAngleFix:', {
+        method: after.appData && after.appData.settings && after.appData.settings.calculationMethod,
+        calcAngleFixApplied: after.appData && after.appData.settings && after.appData.settings.calcAngleFixApplied,
+        vakitOffsets: after.appData && after.appData.settings && after.appData.settings.vakitOffsets,
+        calcAngleNotice: after.calcAngleNotice
+    });
+    return after;
 }
 
 async function initAlarm() {

@@ -146,5 +146,9 @@
   "copiedText": {
     "message": "Copiado",
     "description": ""
+  },
+  "calcAngleUpdateNotice": {
+    "message": "O cálculo dos horários de oração para o método selecionado ({method}) foi atualizado para maior precisão. Quaisquer ajustes manuais de horário (deslocamentos) que você definiu foram redefinidos para 0. Verifique seus horários de oração e reaplique os deslocamentos apenas se ainda precisar deles.",
+    "description": "One-time notice shown after v2.0.20 when a calculation method's angles changed and manual offsets were reset."
   }
 }

@@ -146,5 +146,9 @@
   "copiedText": {
     "message": "Disalin",
     "description": ""
+  },
+  "calcAngleUpdateNotice": {
+    "message": "Perhitungan waktu salat untuk metode yang Anda pilih ({method}) telah diperbarui untuk akurasi yang lebih baik. Semua penyesuaian waktu manual (offset) yang Anda atur sebelumnya telah disetel ulang ke 0. Silakan periksa waktu salat Anda dan terapkan kembali offset hanya jika masih diperlukan.",
+    "description": "One-time notice shown after v2.0.20 when a calculation method's angles changed and manual offsets were reset."
   }
 }

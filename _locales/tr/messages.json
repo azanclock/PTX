@@ -146,5 +146,9 @@
   "copiedText": {
     "message": "Kopyalandı",
     "description": ""
+  },
+  "calcAngleUpdateNotice": {
+    "message": "Seçtiğiniz yöntem ({method}) için namaz vakti hesaplaması, daha yüksek doğruluk için güncellendi. Daha önce ayarladığınız manuel zaman düzeltmeleri (offset) 0'a sıfırlandı. Lütfen namaz vakitlerinizi kontrol edin ve yalnızca hâlâ gerekiyorsa düzeltmeleri yeniden uygulayın.",
+    "description": "One-time notice shown after v2.0.20 when a calculation method's angles changed and manual offsets were reset."
   }
 }

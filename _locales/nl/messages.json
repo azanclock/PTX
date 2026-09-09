@@ -146,5 +146,9 @@
   "copiedText": {
     "message": "Gekopieerd",
     "description": ""
+  },
+  "calcAngleUpdateNotice": {
+    "message": "De berekening van gebedstijden voor je gekozen methode ({method}) is bijgewerkt voor betere nauwkeurigheid. Alle handmatige tijdcorrecties (offsets) die je had ingesteld, zijn teruggezet naar 0. Controleer je gebedstijden en pas offsets alleen opnieuw toe als je ze nog nodig hebt.",
+    "description": "One-time notice shown after v2.0.20 when a calculation method's angles changed and manual offsets were reset."
   }
 }

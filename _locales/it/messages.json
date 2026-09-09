@@ -146,5 +146,9 @@
   "copiedText": {
     "message": "Copiato",
     "description": ""
+  },
+  "calcAngleUpdateNotice": {
+    "message": "Il calcolo degli orari di preghiera per il metodo selezionato ({method}) è stato aggiornato per una maggiore precisione. Tutte le regolazioni manuali dell'orario (offset) che avevi impostato sono state riportate a 0. Controlla i tuoi orari di preghiera e riapplica gli offset solo se ti servono ancora.",
+    "description": "One-time notice shown after v2.0.20 when a calculation method's angles changed and manual offsets were reset."
   }
 }

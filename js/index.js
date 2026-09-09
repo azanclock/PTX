@@ -6,7 +6,30 @@ chrome.runtime.onMessage.addListener((msg) => { if ('runApp' in msg) { runApp() 
 $(function () {
     goGoRun('1stLoad');
     setInterval(goGoRun, 1000);
+    maybeShowCalcAngleNotice();
 });
+
+/* one-time (v2.0.20): tell affected users their calculation angles were updated
+   and that any manual time offsets were reset. The service-worker migration sets
+   the calcAngleNotice flag; it stays until the user closes the banner. */
+const maybeShowCalcAngleNotice = async () => {
+    const { calcAngleNotice } = await chrome.storage.local.get(['calcAngleNotice']);
+    if (!calcAngleNotice) return;
+
+    const data = (await chrome.storage.local.get(['appData'])).appData;
+    const method = calcAngleNotice.method || (data && data.settings && data.settings.calculationMethod) || '';
+    const message = (data && data.i18n && data.i18n.calcAngleUpdateNotice)
+        || 'The prayer time calculation for your selected method (' + method + ') has been updated for improved accuracy. '
+        + 'Any manual time adjustments (offsets) you had set were reset to 0. '
+        + 'Please review your prayer times and re-apply offsets only if you still need them.';
+
+    $('#calcAngleNoticeText').text(message.replace('{method}', method));
+    $('#calcAngleNoticeClose').off('click').on('click', function () {
+        $('#calcAngleNoticeBar').hide();
+        chrome.storage.local.remove('calcAngleNotice');
+    });
+    $('#calcAngleNoticeBar').show();
+};
 
 const goGoRun = (info) => {
     navigator.serviceWorker.controller.postMessage({ goGoRun: (info ?? '') })

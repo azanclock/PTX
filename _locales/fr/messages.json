@@ -146,5 +146,9 @@
   "copiedText": {
     "message": "Copié",
     "description": ""
+  },
+  "calcAngleUpdateNotice": {
+    "message": "Le calcul des horaires de prière pour la méthode sélectionnée ({method}) a été mis à jour pour une meilleure précision. Tous les ajustements horaires manuels (décalages) que vous aviez définis ont été remis à 0. Veuillez vérifier vos horaires de prière et ne réappliquer les décalages que si vous en avez encore besoin.",
+    "description": "One-time notice shown after v2.0.20 when a calculation method's angles changed and manual offsets were reset."
   }
 }

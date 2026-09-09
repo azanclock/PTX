@@ -146,5 +146,9 @@
   "copiedText": {
     "message": "Скопійовано",
     "description": ""
+  },
+  "calcAngleUpdateNotice": {
+    "message": "The prayer time calculation for your selected method ({method}) has been updated for improved accuracy. Any manual time adjustments (offsets) you had set were reset to 0. Please review your prayer times and re-apply offsets only if you still need them.",
+    "description": "One-time notice shown after v2.0.20 when a calculation method's angles changed and manual offsets were reset."
   }
 }

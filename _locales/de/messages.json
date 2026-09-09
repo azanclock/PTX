@@ -146,5 +146,9 @@
   "copiedText": {
     "message": "Kopiert",
     "description": ""
+  },
+  "calcAngleUpdateNotice": {
+    "message": "Die Gebetszeitenberechnung für deine gewählte Methode ({method}) wurde für höhere Genauigkeit aktualisiert. Alle von dir gesetzten manuellen Zeitanpassungen (Offsets) wurden auf 0 zurückgesetzt. Bitte überprüfe deine Gebetszeiten und wende Offsets nur erneut an, wenn du sie noch brauchst.",
+    "description": "One-time notice shown after v2.0.20 when a calculation method's angles changed and manual offsets were reset."
   }
 }

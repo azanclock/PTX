@@ -62,7 +62,13 @@ body {
 }
 
 #nextText {
+    display: inline-block;
     font-size: 25px;
+    padding: 5px 18px;
+    margin-top: 3px;
+    border-radius: 8px;
+    letter-spacing: 1px;
+    line-height: 1.2;
 }
 
 .zakat-link {
@@ -167,4 +173,40 @@ body {
 
 .tooltip .tooltip-inner {
     text-align: left !important;
+}
+
+#calcAngleNoticeBar {
+    position: fixed;
+    left: 20px;
+    right: 20px;
+    bottom: 10px;
+    max-width: 287px;
+    margin: 0 auto;
+    z-index: 300;
+    background-color: #1e3050;
+    color: whitesmoke;
+    border: 2px solid #007bff;
+    border-radius: 6px;
+    padding: 18px 40px 18px 20px;
+    font-size: 12px;
+    line-height: 1.45;
+    text-align: left;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
+}
+
+#calcAngleNoticeClose {
+    position: absolute;
+    top: 8px;
+    right: 9px;
+    background: transparent;
+    border: 0;
+    color: whitesmoke;
+    font-size: 19px;
+    line-height: 1;
+    padding: 2px 7px;
+    cursor: pointer;
+}
+
+#calcAngleNoticeClose:hover {
+    color: #ffffff;
 }

@@ -4,7 +4,7 @@
 	{ id: 'FranceAngle18', name: 'France - 18° Angle', params: { fajr: 18, isha: 18 }, methodOffsets: {} },
 	{ id: 'FranceUOIFAngle12', name: 'France UOIF - 12° Angle', params: { fajr: 12, isha: 12 }, methodOffsets: {} },
 	{ id: 'ISNA', name: 'Islamic Society of North America (ISNA)', params: { fajr: 15, isha: 15 }, methodOffsets: {} },
-	{ id: 'JAKIM', name: 'Jabatan Kemajuan Islam Malaysia', params: { fajr: 20, isha: 18 }, methodOffsets: {} },
+	{ id: 'JAKIM', name: 'Jabatan Kemajuan Islam Malaysia', params: { fajr: 18, isha: 18 }, methodOffsets: { fajr: 2, dhuhr: 3, asr: 2, maghrib: 2, isha: 1 } },
 	{ id: 'Jordan', name: 'Jordan Ministry of Awqaf', params: { fajr: 18, isha: 18 }, methodOffsets: { maghrib: 5 } },
 	{ id: 'KEMENAG', name: 'Kementrian Agama Indonesia', params: { fajr: 20, isha: 18 }, methodOffsets: {} },
 	{ id: 'Kuwait', name: 'Kuwait', params: { fajr: 18, isha: 17.5 }, methodOffsets: {} },
@@ -79,6 +79,11 @@ const languages = [
 const imsakDefaultOffset = -10;
 const duhaDefaultOffset = 15;
 const duhaendDefaultOffset = -10;
+
+/* Methods whose twilight angles / method offsets changed in v2.0.20.
+   Users on these methods get a one-time manual-offset reset + notice,
+   so previously dialed-in corrections don't stack on top of the fix. */
+const calcAngleUpdatedMethods = ['JAKIM'];
 
 const settingsCodeFields = ['address', 'calculationMethod', 'adhans', 'timeZoneID', 'lat', 'lng', 'areAdhansEnabled',
 	'adhans', 'vakitOffsets', 'timeFormat', 'showMidnight', 'showDuha', 'showImsak', 'hanafiAsr',
