@@ -454,6 +454,39 @@ const saveAppDataAndRefresh = (appData) => {
     });
 }
 
+/* Shrink the top-bar address font so the location label always fits the space
+   left between the menu icons and the current-time badge. That space varies with
+   the icon state and with the time width (12h "12:34 PM" vs 24h "13:34"), so it
+   is measured fresh each refresh: reset to the stylesheet size, then step down
+   until the (up to 20-char) text fits, down to a readable floor. */
+const fitAddressFontSize = () => {
+    const el = document.getElementById('addressMenuText');
+    if (!el) return;
+    const rightGroup = el.parentElement;
+    const row = rightGroup && rightGroup.parentElement;
+    if (!row) return;
+    const leftGroup = row.firstElementChild;
+    const timeEl = rightGroup.querySelector('.timeNowTitle');
+    const gap = parseFloat(getComputedStyle(rightGroup).columnGap) || 0;
+    const avail = row.clientWidth
+        - (leftGroup ? leftGroup.offsetWidth : 0)
+        - (timeEl ? timeEl.offsetWidth : 0)
+        - gap;
+    if (avail <= 0) return;
+    // Measure true content width without the max-width clamp, starting from the
+    // stylesheet size, and shrink by half-pixels until it fits (min 8px).
+    const prevMaxWidth = el.style.maxWidth;
+    el.style.maxWidth = 'none';
+    el.style.fontSize = '';
+    let fontPx = parseFloat(getComputedStyle(el).fontSize) || 12;
+    const minPx = 8;
+    while (el.offsetWidth > avail && fontPx > minPx) {
+        fontPx -= 0.5;
+        el.style.fontSize = fontPx + 'px';
+    }
+    el.style.maxWidth = prevMaxWidth;
+};
+
 const setFields = async () => {
 
     $('#stopAdhanDiv').hide();
@@ -461,15 +494,16 @@ const setFields = async () => {
         $('#stopAdhanDiv').show();
 
     let hasAlarms = (appData.settings.alarms && appData.settings.alarms.length) || (appData.settings.naflAlarms && appData.settings.naflAlarms.length);
-    $('#alarmMenuIcon').attr('src', hasAlarms ? 'images/alarm-red.svg' : 'images/alarm.svg');
+    $('#alarmDot').toggle(!!hasAlarms);
 
     if (!$('#basicSettings').is(':visible'))
         $('#address').val(appData.settings.address);
 
-    let topAddressMaxLen = 7;
+    let topAddressMaxLen = 20;
     let topAddress = appData.settings.address.substring(0, topAddressMaxLen).trimEnd() + ((appData.settings.address.length > topAddressMaxLen) ? '…' : '');
     $('#addressMenuText').html(topAddress);
     $('.timeNowTitle').html(appData.timeNow).attr('title', 'Current Time in ' + appData.settings.timeZoneID);
+    fitAddressFontSize();
     const calculationMethodEl = document.getElementById('calculationMethod');
     const isCalculationMethodActive = document.activeElement === calculationMethodEl;
     if (!isCalculationMethodActive) {
@@ -911,7 +945,7 @@ const renderAlarmsList = () => {
 
 const alarmCard = (dotClass, name, schedule, type, index) => {
     return `
-        <div class="bg-darkish rounded px-2 py-2 mb-1">
+        <div class="alarm-card bg-darkish rounded px-2 py-2 mb-1">
             <div class="d-flex flex-row justify-content-between align-items-center gap-2">
                 <div class="text-truncate">
                     <span class="${dotClass}"></span> <b class="small">${name}</b>

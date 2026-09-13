@@ -61,6 +61,24 @@ body {
     height: 27px;
 }
 
+/* Alarm bell notification badge: a small red dot on the bell's top-right, shown
+   when any alarm is set (instead of recolouring the whole bell). The ring is the
+   header background colour so the dot stays crisp where it meets the bell. */
+#menu-div-alarms {
+    position: relative;
+}
+
+.alarm-badge {
+    position: absolute;
+    top: 4px;
+    right: 6px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: #F20031;
+    box-shadow: 0 0 0 1.5px #212529;
+}
+
 .btn-xs {
     padding: 0px 7px;
     font-size: 13px;
@@ -86,6 +104,7 @@ body {
 .menu-text {
     max-width: 220px;
     overflow: hidden;
+    white-space: nowrap;
 }
 
 .offadj.currentVakit {
@@ -168,11 +187,26 @@ body {
     color: whitesmoke;
     font-weight: 600;
     background-color: #31373E;
+    /* Trace the outline of the connected tab+panel shape with a subtle border.
+       border-bottom is dropped and the tab is pulled 1px over the panel so its
+       matching background hides the panel's top border beneath the active tab. */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 0;
+    position: relative;
+    z-index: 1;
+    margin-bottom: -1px;
 }
 
 #alarms-tabContent {
     background-color: #31373E;
     border-radius: 0 0 6px 6px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Alarm / nafl entries in the list: a subtle border to lift each card off the
+   dark body, matching the alarm form's outline. */
+.alarm-card {
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 #loading {
