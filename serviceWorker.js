@@ -31,10 +31,13 @@ let clockFaceVakit;
 
 const r = 160;
 const ir = 12;
+/* Render the toolbar icon/bar at high resolution (38px is the toolbar size) so the
+   popup's "Icon Style" previews — which show these same images ~40px — stay crisp. */
+const iconSize = 128;
 const colors = { black: '#212529', silver: 'whitesmoke', tomato: '#F20031', gray: '#2E3338' };
 const ctx = new OffscreenCanvas(470, 470).getContext("2d", { alpha: true, willReadFrequently: true });
-const itx = new OffscreenCanvas(38, 38).getContext("2d", { alpha: true, willReadFrequently: true });
-const btx = new OffscreenCanvas(38, 38).getContext("2d", { alpha: true, willReadFrequently: true });
+const itx = new OffscreenCanvas(iconSize, iconSize).getContext("2d", { alpha: true, willReadFrequently: true });
+const btx = new OffscreenCanvas(iconSize, iconSize).getContext("2d", { alpha: true, willReadFrequently: true });
 const defaultAdhanSettings = { fajr: 12, dhuhr: 7, asr: 3, maghrib: 6, isha: 1 };
 
 async function run(info) {
@@ -65,10 +68,10 @@ async function run(info) {
     updateClock(ctx, r);
 
     clearCanvas(itx);
-    updateIcon(itx, ir);
+    updateIcon(itx, ir * iconSize / 38);
 
     clearCanvas(btx);
-    updateBar(btx, ir);
+    updateBar(btx, ir * iconSize / 38);
 
     extensionOps();
 }
@@ -157,6 +160,12 @@ async function initUser(i18nValues, appData) {
             if (!appData.settings.volume) {
                 appData.settings.volume = 5;
             }
+            if (!appData.settings.alarms) {
+                appData.settings.alarms = [];
+            }
+            if (!appData.settings.naflAlarms) {
+                appData.settings.naflAlarms = [];
+            }
 
             /* one-time (v2.0.20): twilight angles / method offsets for some calculation
                methods were corrected. A manual offset dialed in to compensate the old
@@ -197,7 +206,9 @@ async function initUser(i18nValues, appData) {
                 showDuha: false,
                 showMidnight: false,
                 volume: 5,
-                calcAngleFixApplied: true
+                calcAngleFixApplied: true,
+                alarms: [],
+                naflAlarms: []
             }
             let appData = {
                 settings: settings,
@@ -231,6 +242,8 @@ async function initDefaultUser(i18nValues) {
     appData.settings.areAdhansEnabled = false;
     appData.settings.volume = 5;
     appData.settings.calcAngleFixApplied = true;
+    appData.settings.alarms = [];
+    appData.settings.naflAlarms = [];
     await chrome.storage.local.set({ 'appData': appData });
 }
 
@@ -513,6 +526,8 @@ function updateClock(canvas, r) {
 
     }
 
+    markAlarms(canvas, r);
+
     let hourRadians = hoursToRadians(hours12(currentTime.getHours()) * 60 + currentTime.getMinutes());
     let minuteRadians = minutesToRadians(currentTime.getMinutes());
     let secondRadians = secondsToRadians(currentTime.getSeconds());
@@ -549,9 +564,10 @@ function updateBar(canvas, r) {
         barColor = colors.tomato;
     }
 
-    let iWidth = 38;
-    let iHeight = 16;
-    let borderPadding = 1.8;
+    let scale = canvas.canvas.width / 38;
+    let iWidth = 38 * scale;
+    let iHeight = 16 * scale;
+    let borderPadding = 1.8 * scale;
     let actualWidth = iWidth - 2 * borderPadding;
     let actualHeight = iHeight - 2 * borderPadding;
 
@@ -654,6 +670,8 @@ function extensionOps() {
 
     }
 
+    checkAlarms();
+
     if (nextText.length < 4)
         nextText = ' ' + nextText + ' ';
 
@@ -662,10 +680,10 @@ function extensionOps() {
     if (appData.settings.iconStyle === "badge") {
         chrome.action.setBadgeText({ 'text': nextText });
         chrome.action.setBadgeBackgroundColor({ 'color': badgeBackgroundColor });
-        chrome.action.setIcon({ imageData: { "38": btx.getImageData(0, 0, 38, 38) } });
+        chrome.action.setIcon({ imageData: { [iconSize]: btx.getImageData(0, 0, iconSize, iconSize) } });
     }
     else {
-        chrome.action.setIcon({ imageData: { "38": itx.getImageData(0, 0, 38, 38) } });
+        chrome.action.setIcon({ imageData: { [iconSize]: itx.getImageData(0, 0, iconSize, iconSize) } });
     }
 
     appData.nextText = nextText;
@@ -829,6 +847,64 @@ function drawArrow(canvas, angle, x, width, height, color) {
     canvas.restore();
 }
 
+/* Mark each defined alarm on the clock ring at its time, using the alarm-type
+   colour (Alarm = amber, Nafl Alarm = green) — the same colours as the alarm
+   tabs, buttons and list dots. Positions use the 12-hour dial like the hands. */
+function markAlarms(canvas, r) {
+
+    let alarms = appData.settings.alarms || [];
+    let naflAlarms = appData.settings.naflAlarms || [];
+
+    if (alarms.length === 0 && naflAlarms.length === 0)
+        return;
+
+    let markerRadius = r * 1.19;
+    let isWeekDay = currentTime.getDay() > 0 && currentTime.getDay() < 6;
+
+    alarms.forEach((a) => {
+        if ((a.frequency === 'E') || (a.frequency === 'W' && isWeekDay))
+            drawIndicator(canvas, markerRadius, timeToRadians(a.time, 12), '#ffc107');
+    });
+
+    if (naflAlarms.length > 0) {
+
+        let totalMinutesInIsha = diffMinutesBetweenTimes(getPrayerTime('maghrib'), getPrayerTime('fajr'));
+        let oneThird = totalMinutesInIsha / 3;
+        let oneThirdTime = addMinutesToTime(getPrayerTime('maghrib'), oneThird);
+        let twoThirdTime = addMinutesToTime(getPrayerTime('maghrib'), oneThird * 2);
+        let midnightTime = getPrayerTime('midnight');
+
+        naflAlarms.forEach((a) => {
+            let base;
+            if (a.vakit.indexOf('1/3') === 0)
+                base = oneThirdTime;
+            else if (a.vakit.indexOf('2/3') === 0)
+                base = twoThirdTime;
+            else if (a.vakit.indexOf('Midnight') === 0)
+                base = midnightTime;
+            else
+                base = getPrayerTime(a.vakit.toLowerCase());
+
+            let addMinutes = a.when === 'before' ? -a.minutes : a.minutes;
+            let naflTime = addMinutesToTime(base, addMinutes);
+            drawIndicator(canvas, markerRadius, timeToRadians(naflTime, 12), '#198754');
+        });
+    }
+}
+
+function drawIndicator(canvas, radius, angle, color) {
+    canvas.save();
+    canvas.rotate(angle);
+    canvas.beginPath();
+    canvas.arc(radius, 0, r * 0.075, 0, Math.PI * 2);
+    canvas.fillStyle = color;
+    canvas.fill();
+    canvas.lineWidth = 2.5;
+    canvas.strokeStyle = colors.silver;
+    canvas.stroke();
+    canvas.restore();
+}
+
 function isAdhanAvailable() {
     return appData.settings.areAdhansEnabled && appData.currentVakitAdhanAudioID > 0;
 }
@@ -841,11 +917,76 @@ async function callAdhan() {
             console.log('Already called for ' + callString);
         }
         else {
-            await chrome.storage.local.set({ 'adhanStatus': { lastCall: callString, isBeingCalled: true } });
+            adhanStatus.lastCall = callString;
+            adhanStatus.isBeingCalled = true;
+            await chrome.storage.local.set({ 'adhanStatus': adhanStatus });
             await createOffscreen();
             await chrome.runtime.sendMessage({ audioID: appData.currentVakitAdhanAudioID, volume: appData.settings.volume });
         }
     }
+}
+
+/* Alarms & Nafl prayer alarms. Fixed alarms fire at a set clock time (every day
+   or weekdays only); nafl alarms fire a number of minutes before/after a vakit or
+   a night fraction. Unlike azans, an alarm exists only because the user set it, so
+   it always fires regardless of the "Enable Adhan Calls" switch — to stop getting
+   one, remove it. They share the adhan audio pipeline and the same stop button. */
+function checkAlarms() {
+
+    let alarms = appData.settings.alarms || [];
+    let naflAlarms = appData.settings.naflAlarms || [];
+
+    if (alarms.length === 0 && naflAlarms.length === 0)
+        return;
+
+    let isWeekDay = currentTime.getDay() > 0 && currentTime.getDay() < 6;
+
+    alarms.forEach((a) => {
+        if (currentTimeString === a.time && ((a.frequency === 'E') || (a.frequency === 'W' && isWeekDay))) {
+            callAlarm(a.id, 'f-' + a.time + '-' + a.frequency);
+        }
+    });
+
+    if (naflAlarms.length > 0) {
+
+        let totalMinutesInIsha = diffMinutesBetweenTimes(getPrayerTime('maghrib'), getPrayerTime('fajr'));
+        let oneThird = totalMinutesInIsha / 3;
+        let oneThirdTime = addMinutesToTime(getPrayerTime('maghrib'), oneThird);
+        let twoThirdTime = addMinutesToTime(getPrayerTime('maghrib'), oneThird * 2);
+        let midnightTime = getPrayerTime('midnight');
+
+        naflAlarms.forEach((a) => {
+            let base;
+            if (a.vakit.indexOf('1/3') === 0)
+                base = oneThirdTime;
+            else if (a.vakit.indexOf('2/3') === 0)
+                base = twoThirdTime;
+            else if (a.vakit.indexOf('Midnight') === 0)
+                base = midnightTime;
+            else
+                base = getPrayerTime(a.vakit.toLowerCase());
+
+            let addMinutes = a.when === 'before' ? -a.minutes : a.minutes;
+            let alarmTime = addMinutesToTime(base, addMinutes);
+
+            if (currentTimeString === alarmTime) {
+                callAlarm(a.id, 'n-' + a.vakit + '-' + a.when + '-' + a.minutes);
+            }
+        });
+    }
+}
+
+async function callAlarm(audioID, tag) {
+    let callString = appData.timeNow24 + '-alarm-' + tag + '-' + audioID;
+    if (adhanStatus.lastAlarmCall === callString) {
+        console.log('Alarm already called for ' + callString);
+        return;
+    }
+    adhanStatus.lastAlarmCall = callString;
+    adhanStatus.isBeingCalled = true;
+    await chrome.storage.local.set({ 'adhanStatus': adhanStatus });
+    await createOffscreen();
+    await chrome.runtime.sendMessage({ audioID: audioID, volume: appData.settings.volume });
 }
 
 async function endAdhanCall() {

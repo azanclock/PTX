@@ -150,5 +150,49 @@
   "calcAngleUpdateNotice": {
     "message": "The prayer time calculation for your selected method ({method}) has been updated for improved accuracy. Any manual time adjustments (offsets) you had set were reset to 0. Please review your prayer times and re-apply offsets only if you still need them.",
     "description": "One-time notice shown after v2.0.20 when a calculation method's angles changed and manual offsets were reset."
+  },
+  "weekdaysText": {
+    "message": "روزهای هفته",
+    "description": "Alarm frequency option: weekdays (Mon-Fri)"
+  },
+  "everydayText": {
+    "message": "هر روز",
+    "description": "Alarm frequency option: every day"
+  },
+  "beforeText": {
+    "message": "قبل از",
+    "description": "Nafl alarm timing: before the prayer/night point"
+  },
+  "afterText": {
+    "message": "بعد از",
+    "description": "Nafl alarm timing: after the prayer/night point"
+  },
+  "oneThirdText": {
+    "message": "یک‌سوم شب",
+    "description": "Nafl alarm anchor: one third of the night"
+  },
+  "twoThirdText": {
+    "message": "دو‌سوم شب",
+    "description": "Nafl alarm anchor: two thirds of the night"
+  },
+  "minText": {
+    "message": "دقیقه",
+    "description": "Abbreviation for minutes, shown in the nafl-alarm dropdown (e.g. '15 min')"
+  },
+  "alarmsNoteText": {
+    "message": "هشدارها همیشه پخش می‌شوند، حتی وقتی اذان خاموش باشد.",
+    "description": "Note on the alarm page: alarms fire regardless of the adhan on/off setting"
+  },
+  "noAlarmsText": {
+    "message": "هیچ هشداری تنظیم نشده است.",
+    "description": "Empty-state text shown on the alarm page when no alarms are set"
+  },
+  "alarmTabText": {
+    "message": "هشدار",
+    "description": "Alarm tab title (shown after a + )"
+  },
+  "naflTabText": {
+    "message": "هشدار نافله",
+    "description": "Nafl (voluntary prayer) alarm tab title (shown after a + )"
   }
 }

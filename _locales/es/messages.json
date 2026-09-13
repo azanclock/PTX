@@ -150,5 +150,49 @@
   "calcAngleUpdateNotice": {
     "message": "El cálculo de los horarios de oración para el método seleccionado ({method}) se ha actualizado para mejorar la precisión. Los ajustes manuales de tiempo (desfases) que habías configurado se restablecieron a 0. Revisa tus horarios de oración y vuelve a aplicar los desfases solo si aún los necesitas.",
     "description": "One-time notice shown after v2.0.20 when a calculation method's angles changed and manual offsets were reset."
+  },
+  "weekdaysText": {
+    "message": "Entre semana",
+    "description": "Alarm frequency option: weekdays (Mon-Fri)"
+  },
+  "everydayText": {
+    "message": "Todos los días",
+    "description": "Alarm frequency option: every day"
+  },
+  "beforeText": {
+    "message": "antes",
+    "description": "Nafl alarm timing: before the prayer/night point"
+  },
+  "afterText": {
+    "message": "después",
+    "description": "Nafl alarm timing: after the prayer/night point"
+  },
+  "oneThirdText": {
+    "message": "1/3 de la noche",
+    "description": "Nafl alarm anchor: one third of the night"
+  },
+  "twoThirdText": {
+    "message": "2/3 de la noche",
+    "description": "Nafl alarm anchor: two thirds of the night"
+  },
+  "minText": {
+    "message": "min",
+    "description": "Abbreviation for minutes, shown in the nafl-alarm dropdown (e.g. '15 min')"
+  },
+  "alarmsNoteText": {
+    "message": "Las alarmas siempre suenan, incluso con el adhan desactivado.",
+    "description": "Note on the alarm page: alarms fire regardless of the adhan on/off setting"
+  },
+  "noAlarmsText": {
+    "message": "No hay alarmas configuradas.",
+    "description": "Empty-state text shown on the alarm page when no alarms are set"
+  },
+  "alarmTabText": {
+    "message": "Alarma",
+    "description": "Alarm tab title (shown after a + )"
+  },
+  "naflTabText": {
+    "message": "Alarma Nafl",
+    "description": "Nafl (voluntary prayer) alarm tab title (shown after a + )"
   }
 }

@@ -1,4 +1,4 @@
-{
+﻿{
   "name": {
     "message": "Chrome-extensie voor gebedstijden",
     "description": ""
@@ -150,5 +150,49 @@
   "calcAngleUpdateNotice": {
     "message": "De berekening van gebedstijden voor je gekozen methode ({method}) is bijgewerkt voor betere nauwkeurigheid. Alle handmatige tijdcorrecties (offsets) die je had ingesteld, zijn teruggezet naar 0. Controleer je gebedstijden en pas offsets alleen opnieuw toe als je ze nog nodig hebt.",
     "description": "One-time notice shown after v2.0.20 when a calculation method's angles changed and manual offsets were reset."
+  },
+  "weekdaysText": {
+    "message": "Weekdagen",
+    "description": "Alarm frequency option: weekdays (Mon-Fri)"
+  },
+  "everydayText": {
+    "message": "Elke dag",
+    "description": "Alarm frequency option: every day"
+  },
+  "beforeText": {
+    "message": "voor",
+    "description": "Nafl alarm timing: before the prayer/night point"
+  },
+  "afterText": {
+    "message": "na",
+    "description": "Nafl alarm timing: after the prayer/night point"
+  },
+  "oneThirdText": {
+    "message": "1/3 van de nacht",
+    "description": "Nafl alarm anchor: one third of the night"
+  },
+  "twoThirdText": {
+    "message": "2/3 van de nacht",
+    "description": "Nafl alarm anchor: two thirds of the night"
+  },
+  "minText": {
+    "message": "min",
+    "description": "Abbreviation for minutes, shown in the nafl-alarm dropdown (e.g. '15 min')"
+  },
+  "alarmsNoteText": {
+    "message": "Alarmen worden altijd afgespeeld, ook als de adhan uit staat.",
+    "description": "Note on the alarm page: alarms fire regardless of the adhan on/off setting"
+  },
+  "noAlarmsText": {
+    "message": "Geen alarmen ingesteld.",
+    "description": "Empty-state text shown on the alarm page when no alarms are set"
+  },
+  "alarmTabText": {
+    "message": "Alarm",
+    "description": "Alarm tab title (shown after a + )"
+  },
+  "naflTabText": {
+    "message": "Nafl-alarm",
+    "description": "Nafl (voluntary prayer) alarm tab title (shown after a + )"
   }
 }

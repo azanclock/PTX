@@ -150,5 +150,49 @@
   "calcAngleUpdateNotice": {
     "message": "Die Gebetszeitenberechnung für deine gewählte Methode ({method}) wurde für höhere Genauigkeit aktualisiert. Alle von dir gesetzten manuellen Zeitanpassungen (Offsets) wurden auf 0 zurückgesetzt. Bitte überprüfe deine Gebetszeiten und wende Offsets nur erneut an, wenn du sie noch brauchst.",
     "description": "One-time notice shown after v2.0.20 when a calculation method's angles changed and manual offsets were reset."
+  },
+  "weekdaysText": {
+    "message": "Wochentags",
+    "description": "Alarm frequency option: weekdays (Mon-Fri)"
+  },
+  "everydayText": {
+    "message": "Täglich",
+    "description": "Alarm frequency option: every day"
+  },
+  "beforeText": {
+    "message": "vor",
+    "description": "Nafl alarm timing: before the prayer/night point"
+  },
+  "afterText": {
+    "message": "nach",
+    "description": "Nafl alarm timing: after the prayer/night point"
+  },
+  "oneThirdText": {
+    "message": "1/3 der Nacht",
+    "description": "Nafl alarm anchor: one third of the night"
+  },
+  "twoThirdText": {
+    "message": "2/3 der Nacht",
+    "description": "Nafl alarm anchor: two thirds of the night"
+  },
+  "minText": {
+    "message": "Min.",
+    "description": "Abbreviation for minutes, shown in the nafl-alarm dropdown (e.g. '15 min')"
+  },
+  "alarmsNoteText": {
+    "message": "Alarme werden immer abgespielt, auch wenn der Adhan-Ruf aus ist.",
+    "description": "Note on the alarm page: alarms fire regardless of the adhan on/off setting"
+  },
+  "noAlarmsText": {
+    "message": "Keine Wecker eingestellt.",
+    "description": "Empty-state text shown on the alarm page when no alarms are set"
+  },
+  "alarmTabText": {
+    "message": "Wecker",
+    "description": "Alarm tab title (shown after a + )"
+  },
+  "naflTabText": {
+    "message": "Nafl-Wecker",
+    "description": "Nafl (voluntary prayer) alarm tab title (shown after a + )"
   }
 }

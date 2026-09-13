@@ -150,5 +150,49 @@
   "calcAngleUpdateNotice": {
     "message": "The prayer time calculation for your selected method ({method}) has been updated for improved accuracy. Any manual time adjustments (offsets) you had set were reset to 0. Please review your prayer times and re-apply offsets only if you still need them.",
     "description": "One-time notice shown after v2.0.20 when a calculation method's angles changed and manual offsets were reset."
+  },
+  "weekdaysText": {
+    "message": "வார நாட்கள்",
+    "description": "Alarm frequency option: weekdays (Mon-Fri)"
+  },
+  "everydayText": {
+    "message": "தினமும்",
+    "description": "Alarm frequency option: every day"
+  },
+  "beforeText": {
+    "message": "முன்",
+    "description": "Nafl alarm timing: before the prayer/night point"
+  },
+  "afterText": {
+    "message": "பின்",
+    "description": "Nafl alarm timing: after the prayer/night point"
+  },
+  "oneThirdText": {
+    "message": "இரவின் 1/3",
+    "description": "Nafl alarm anchor: one third of the night"
+  },
+  "twoThirdText": {
+    "message": "இரவின் 2/3",
+    "description": "Nafl alarm anchor: two thirds of the night"
+  },
+  "minText": {
+    "message": "நிமிடம்",
+    "description": "Abbreviation for minutes, shown in the nafl-alarm dropdown (e.g. '15 min')"
+  },
+  "alarmsNoteText": {
+    "message": "அதான் அணைக்கப்பட்டிருந்தாலும் அலாரங்கள் எப்போதும் ஒலிக்கும்.",
+    "description": "Note on the alarm page: alarms fire regardless of the adhan on/off setting"
+  },
+  "noAlarmsText": {
+    "message": "எந்த அலாரமும் அமைக்கப்படவில்லை.",
+    "description": "Empty-state text shown on the alarm page when no alarms are set"
+  },
+  "alarmTabText": {
+    "message": "அலாரம்",
+    "description": "Alarm tab title (shown after a + )"
+  },
+  "naflTabText": {
+    "message": "நஃபில் அலாரம்",
+    "description": "Nafl (voluntary prayer) alarm tab title (shown after a + )"
   }
 }

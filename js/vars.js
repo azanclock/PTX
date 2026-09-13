@@ -46,8 +46,25 @@ const adhanAudios = [
 	{ id: 13, name: 'Shaykh Ali Ahmed Mullah (4:35)', isFajrAdhan: true, isAdhan: false },
 	{ id: 14, name: 'Madinah Style by Muhammad Marwan Qassas (4:10)', isFajrAdhan: false, isAdhan: true },
 	{ id: 15, name: 'Madinah Style by Muhammad Marwan Qassas (5:03)', isFajrAdhan: true, isAdhan: false },
-	{ id: 101, name: 'Bismillahirrahmanirrahim (0:05)', isFajrAdhan: true, isAdhan: true },
-	{ id: 102, name: 'Soft Beep Sound (0:01)', isFajrAdhan: true, isAdhan: true },
+	{ id: 101, name: 'Bismillahirrahmanirrahim (0:05)', isFajrAdhan: true, isAdhan: true, isAlarm: true },
+	{ id: 102, name: 'Soft Beep Sound (0:01)', isFajrAdhan: true, isAdhan: true, isAlarm: true },
+];
+
+/* Alarm sounds: short tones suitable for a wake-up / reminder alarm. */
+const alarmSounds = adhanAudios.filter(a => a.isAlarm);
+/* Nafl prayer alarm sounds: short tones plus the full adhan recitations. */
+const naflSounds = [...alarmSounds, ...adhanAudios.filter(a => !a.isAlarm)];
+/* Vakits (and night fractions) a nafl prayer alarm can be anchored to. */
+const naflVakits = [
+	{ value: 'Fajr', i18n: 'fajrText' },
+	{ value: 'Sunrise', i18n: 'sunriseText' },
+	{ value: 'Dhuhr', i18n: 'dhuhrText' },
+	{ value: 'Asr', i18n: 'asrText' },
+	{ value: 'Maghrib', i18n: 'maghribText' },
+	{ value: 'Isha', i18n: 'ishaText' },
+	{ value: '1/3 of Night', i18n: 'oneThirdText' },
+	{ value: 'Midnight', i18n: 'midnightText' },
+	{ value: '2/3 of Night', i18n: 'twoThirdText' }
 ];
 
 const languages = [

@@ -67,14 +67,6 @@ const runApp = async () => {
         $('.' + key).text(value);
     });
 
-    const isEnglish = appData.i18n.languageCode === 'en';
-    if (isEnglish)
-        $('#zakatLink').show();
-    else
-        $('#zakatLink').hide();
-
-    $('#clock').toggleClass('clock-large', !isEnglish);
-
     $('.vakitDiv').hide();
     for (let i = 0; i < appData.appVakits.length; i++) {
         let vakit = appData.appVakits[i].name.toLowerCase();
@@ -152,6 +144,15 @@ $(function () {
         $('.tabDiv').hide();
         $('#adhanOffsetSettings').show();
         $('#footer').hide();
+    });
+
+    $(".menu-alarms").click(function (e) {
+        $('.menu-div').removeClass('bg-secondary');
+        $('#menu-div-alarms').addClass('bg-secondary');
+        $('.tabDiv').hide();
+        $('#alarmsSettings').show();
+        $('#footer').hide();
+        displayAlarms();
     });
 
     $("#calculationMethod").change(function () {
@@ -338,6 +339,12 @@ $(function () {
         stopAudio();
     });
 
+    $("#addAlarmButton").click(addAlarm);
+    $("#addNaflButton").click(addNaflAlarm);
+    $("#alarmsList").on('click', '.removeAlarmBtn', function () {
+        removeAlarm(this.dataset.type, this.dataset.index * 1);
+    });
+
     $("#stopAdhanDiv").click(() => {
         navigator.serviceWorker.controller.postMessage({ endAdhanCall: true });
     });
@@ -453,11 +460,14 @@ const setFields = async () => {
     if (adhanStatus.isBeingCalled)
         $('#stopAdhanDiv').show();
 
+    let hasAlarms = (appData.settings.alarms && appData.settings.alarms.length) || (appData.settings.naflAlarms && appData.settings.naflAlarms.length);
+    $('#alarmMenuIcon').attr('src', hasAlarms ? 'images/alarm-red.svg' : 'images/alarm.svg');
+
     if (!$('#basicSettings').is(':visible'))
         $('#address').val(appData.settings.address);
 
-    let topAddressMaxLen = 13;
-    let topAddress = appData.settings.address.substring(0, topAddressMaxLen) + ((appData.settings.address.length > topAddressMaxLen) ? '…' : '');
+    let topAddressMaxLen = 7;
+    let topAddress = appData.settings.address.substring(0, topAddressMaxLen).trimEnd() + ((appData.settings.address.length > topAddressMaxLen) ? '…' : '');
     $('#addressMenuText').html(topAddress);
     $('.timeNowTitle').html(appData.timeNow).attr('title', 'Current Time in ' + appData.settings.timeZoneID);
     const calculationMethodEl = document.getElementById('calculationMethod');
@@ -563,6 +573,9 @@ const setFields = async () => {
         $('#volume').attr('disabled', true);
     if (!$('#adhanOffsetSettings').is(':visible'))
         displayAdhansAndOffsets();
+
+    if ($('#alarmsSettings').is(':visible'))
+        displayAlarms();
 
 }
 
@@ -817,6 +830,161 @@ const saveHijriDateOffset = (action) => {
     });
 
 }
+
+const displayAlarms = () => {
+    initAlarmControls();
+    if (!appData || !appData.settings)
+        return;
+    renderAlarmsList();
+};
+
+const initAlarmControls = () => {
+    if ($('#alarmHour option').length === 0) {
+
+        $('#alarmSound').html(alarmSounds.map(a => `<option value="${a.id}">${a.name}</option>`).join(''));
+        $('#naflSound').html(naflSounds.map(a => `<option value="${a.id}">${a.name}</option>`).join(''));
+
+        let hours = '';
+        for (let i = 1; i <= 12; i++)
+            hours += `<option value="${i}">${i}</option>`;
+        $('#alarmHour').html(hours);
+
+        let minutes = '';
+        for (let i = 0; i < 60; i++) {
+            let mv = i < 10 ? '0' + i : i;
+            minutes += `<option value="${mv}">${mv}</option>`;
+        }
+        $('#alarmMinute').html(minutes);
+
+        $('#naflVakit').html(naflVakits.map(v => `<option value="${v.value}" class="${v.i18n}">${(appData.i18n && appData.i18n[v.i18n]) || v.value}</option>`).join(''));
+    }
+
+    /* Nafl minutes ("15 min") — (re)build with the translated unit when the
+       display language changes; the number prefix rules out class-based i18n. */
+    let lang = (appData && appData.i18n && appData.i18n.languageCode) || '';
+    if (lang !== initAlarmControls.lang) {
+        initAlarmControls.lang = lang;
+        let minWord = (appData && appData.i18n && appData.i18n.minText) || 'min';
+        let selected = $('#naflMinutes').val();
+        let naflMinutes = '';
+        for (let i = 1; i <= 60; i++)
+            naflMinutes += `<option value="${i}">${i} ${minWord}</option>`;
+        $('#naflMinutes').html(naflMinutes);
+        if (selected)
+            $('#naflMinutes').val(selected);
+    }
+};
+
+const renderAlarmsList = () => {
+    let alarms = (appData.settings && appData.settings.alarms) || [];
+    let naflAlarms = (appData.settings && appData.settings.naflAlarms) || [];
+
+    let day = new Date(new Date().toLocaleString('en-US', { timeZone: appData.settings.timeZoneID })).getDay();
+    let isWeekDay = day > 0 && day < 6;
+
+    let html = '';
+
+    if (alarms.length === 0 && naflAlarms.length === 0) {
+        let i18n = (appData && appData.i18n) || {};
+        let noAlarms = i18n.noAlarmsText || 'No alarms set.';
+        let note = i18n.alarmsNoteText || 'Alarms always play, even when adhan calls are off.';
+        let bulb = '<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#ffc107" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0; margin-top:3px;"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>';
+        html = `<div class="text-secondary small text-center pt-3 pb-3">${noAlarms}</div>
+                <div class="alarm-tip small d-flex align-items-start gap-2">${bulb}<span>${note}</span></div>`;
+    }
+
+    alarms.forEach((a, index) => {
+        let name = adhanAudios.find(x => x.id == a.id)?.name ?? '';
+        let active = (a.frequency === 'E') || (a.frequency === 'W' && isWeekDay);
+        html += alarmCard(active ? 'alarm-dot' : 'gray-dot', name,
+            `${a.frequency === 'W' ? 'Weekdays' : 'Everyday'} at ${a.hour}:${a.minute}${a.ap}`, 'alarm', index);
+    });
+
+    naflAlarms.forEach((a, index) => {
+        let name = adhanAudios.find(x => x.id == a.id)?.name ?? '';
+        html += alarmCard('nafl-alarm-dot', name,
+            `${a.minutes} min${a.minutes > 1 ? 's' : ''} ${a.when} ${a.vakit}`, 'nafl', index);
+    });
+
+    $('#alarmsList').html(html);
+};
+
+const alarmCard = (dotClass, name, schedule, type, index) => {
+    return `
+        <div class="bg-darkish rounded px-2 py-2 mb-1">
+            <div class="d-flex flex-row justify-content-between align-items-center gap-2">
+                <div class="text-truncate">
+                    <span class="${dotClass}"></span> <b class="small">${name}</b>
+                    <div class="small text-secondary">${schedule}</div>
+                </div>
+                <div>
+                    <button type="button" class="btn btn-sm btn-danger removeAlarmBtn py-0 px-2"
+                        data-type="${type}" data-index="${index}">&times;</button>
+                </div>
+            </div>
+        </div>`;
+};
+
+const addAlarm = () => {
+    chrome.storage.local.get(['appData'], function (result) {
+        appData = result.appData;
+        if (!appData.settings.alarms)
+            appData.settings.alarms = [];
+
+        let id = $('#alarmSound').val() * 1;
+        let frequency = $('#alarmFrequency').val();
+        let hour = $('#alarmHour').val();
+        let minute = $('#alarmMinute').val();
+        let ap = $('#alarmAp').val();
+        let time = (hour === '12' ? (ap === 'pm' ? 12 : 0) : (ap === 'pm' ? hour * 1 + 12 : hour)) + ':' + minute;
+
+        let existingIndex = appData.settings.alarms.findIndex(f => f.hour === hour && f.minute === minute && f.ap === ap && f.frequency === frequency);
+        if (existingIndex >= 0)
+            appData.settings.alarms.splice(existingIndex, 1);
+
+        appData.settings.alarms.push({ id, frequency, hour, minute, ap, time });
+        saveAlarmsAndRefresh();
+    });
+};
+
+const addNaflAlarm = () => {
+    chrome.storage.local.get(['appData'], function (result) {
+        appData = result.appData;
+        if (!appData.settings.naflAlarms)
+            appData.settings.naflAlarms = [];
+
+        let id = $('#naflSound').val() * 1;
+        let minutes = $('#naflMinutes').val() * 1;
+        let when = $('#naflWhen').val();
+        let vakit = $('#naflVakit').val();
+
+        let existingIndex = appData.settings.naflAlarms.findIndex(f => f.minutes === minutes && f.when === when && f.vakit === vakit);
+        if (existingIndex >= 0)
+            appData.settings.naflAlarms.splice(existingIndex, 1);
+
+        appData.settings.naflAlarms.push({ id, minutes, when, vakit });
+        saveAlarmsAndRefresh();
+    });
+};
+
+const removeAlarm = (type, index) => {
+    chrome.storage.local.get(['appData'], function (result) {
+        appData = result.appData;
+        if (type === 'alarm' && appData.settings.alarms)
+            appData.settings.alarms.splice(index, 1);
+        else if (type === 'nafl' && appData.settings.naflAlarms)
+            appData.settings.naflAlarms.splice(index, 1);
+        saveAlarmsAndRefresh();
+    });
+};
+
+const saveAlarmsAndRefresh = () => {
+    chrome.storage.local.set({ 'appData': appData }, function () {
+        goGoRun('alarms updated');
+        renderAlarmsList();
+        $(':focus').blur();
+    });
+};
 
 const addressSearchFail = () => {
     $('#addressButton').attr('disabled', false);

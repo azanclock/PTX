@@ -18,6 +18,14 @@ body {
     height: 579px;
 }
 
+/* Let the card body be clamped to its flex allotment instead of growing to fit
+   its content (default min-height:auto). Without this, a long alarms list pushes
+   the body past the fixed card height and the overflow is clipped/unreachable;
+   with it, the alarms tab's own scroll region (#alarmsList) takes over. */
+#topCard > .card-body {
+    min-height: 0;
+}
+
 .csb::-webkit-scrollbar {
     width: 5px;
 }
@@ -35,13 +43,17 @@ body {
 }
 
 #clock {
-    max-height: 215px;
+    max-height: 240px;
     pointer-events: none;
     user-select: none;
 }
 
-#clock.clock-large {
-    max-height: 235px;
+/* Icon Style previews use the high-res (128px) toolbar icon/bar images; size them
+   down for display so the buttons stay compact. */
+#iconImg,
+#barImg {
+    height: 36px;
+    width: 36px;
 }
 
 .menu-img {
@@ -71,27 +83,6 @@ body {
     line-height: 1.2;
 }
 
-.zakat-link {
-    font-size: 12px;
-    font-weight: 400;
-    text-decoration: none;
-    color: #212529;
-}
-
-.zakat-pill {
-    display: inline-block;
-    padding: 2px 8px;
-    border-radius: 999px;
-    border: 1px solid #6c757d;
-    color: #6c757d;
-}
-
-.zakat-pill:hover {
-    border-color: #ffffff;
-    color: #ffffff;
-    background-color: #6c757d;
-}
-
 .menu-text {
     max-width: 220px;
     overflow: hidden;
@@ -119,6 +110,69 @@ body {
 
 .pointerOn {
     cursor: pointer;
+}
+
+.alarm-dot,
+.gray-dot,
+.nafl-alarm-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.alarm-dot {
+    background-color: #ffc107;
+}
+
+.gray-dot {
+    background-color: gray;
+}
+
+.nafl-alarm-dot {
+    background-color: #198754;
+}
+
+/* Empty-state tip on the alarm page: a soft amber callout with a hanging indent
+   (the lightbulb sits left, wrapped text lines align under the text). */
+.alarm-tip {
+    background-color: rgba(255, 193, 7, 0.1);
+    border-inline-start: 3px solid #ffc107;
+    border-radius: 4px;
+    padding: 8px 10px;
+    color: #adb5bd;
+    text-align: start;
+}
+
+/* Alarm / Nafl-alarm tabs: the active tab shares the content panel's surface so
+   the two read as one connected box, marked with a gold top accent; the inactive
+   tab recedes with a muted colour. */
+#alarms-tab {
+    gap: 2px;
+}
+
+#alarms-tab .nav-link {
+    color: #9aa0a6;
+    background-color: transparent;
+    border: 0;
+    border-radius: 6px 6px 0 0;
+    font-size: 0.78rem;
+}
+
+#alarms-tab .nav-link:hover {
+    color: whitesmoke;
+    background-color: #2a2f34;
+}
+
+#alarms-tab .nav-link.active {
+    color: whitesmoke;
+    font-weight: 600;
+    background-color: #31373E;
+}
+
+#alarms-tabContent {
+    background-color: #31373E;
+    border-radius: 0 0 6px 6px;
 }
 
 #loading {

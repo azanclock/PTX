@@ -33,13 +33,16 @@
                             <img class="menu-img menu-clock-img" />
                         </div>
                         <div id="menu-div-settings" class="menu-div menu-settings pointerOn rounded">
-                            <img class="menu-img pointerOn" src="images/settings.png" />
+                            <img class="menu-img pointerOn" src="images/settings.svg" />
                         </div>
                         <div id="menu-div-adhans-offsets" class="menu-div menu-adhans-offsets rounded pointerOn">
                             <img id="offset-adjustments-blank" style="display:none;" class="menu-img offset-adjustments"
-                                src="images/offset-adjustments-blank.png" />
+                                src="images/offset-adjustments-blank.svg" />
                             <img id="offset-adjustments-red" style="display:none;" class="menu-img offset-adjustments"
-                                src="images/offset-adjustments-red.png" />
+                                src="images/offset-adjustments-red.svg" />
+                        </div>
+                        <div id="menu-div-alarms" class="menu-div menu-alarms rounded pointerOn">
+                            <img id="alarmMenuIcon" class="menu-img" src="images/alarm.svg" />
                         </div>
                     </div>
 
@@ -48,10 +51,6 @@
                     </div>
 
                     <div class="d-flex flex-row align-items-center justify-content-end gap-1">
-                        <div class="adhansToggle pointerOn">
-                            <img class="menu-img adhan-on" style="display:none;" src="images/audio-on.png" />
-                            <img class="menu-img adhan-off" style="display:none;" src="images/audio-off.png" />
-                        </div>
                         <div class="menu-text badge bg-darkish text-light timeNowTitle">
                         </div>
                         <div id="addressMenuText" class="menu-text badge bg-light text-dark menu-settings pointerOn">
@@ -63,7 +62,13 @@
             </div>
             <div class="card-body py-0 px-3">
 
-                <div id="times" class="tabDiv text-center">
+                <div id="times" class="tabDiv text-center" style="position:relative;">
+
+                    <span class="adhansToggle pointerOn" title="Azan audio on / off — tap to change"
+                        style="position:absolute; top:2px; right:-4px; z-index:5; line-height:1;">
+                        <img class="adhan-on" src="images/audio-on.png" style="height:18px; display:none;" />
+                        <img class="adhan-off" src="images/audio-off.png" style="height:18px; display:none;" />
+                    </span>
 
                     <img class="align-center img-fluid mt-2" id="clock" />
 
@@ -76,10 +81,6 @@
                             <div class="mt-1">
                                 <span id="elapsedText" class="badge bg-darkish"></span>
                                 <span id="remainingForIftar" class="badge bg-success text-light"></span>
-                            </div>
-                            <div class="mt-1">
-                                <a id="zakatLink" class="zakat-link zakat-pill" href="https://zakattracker.com/?ptx"
-                                    target="_blank" rel="noopener noreferrer">Calculate and track your zakat easily.</a>
                             </div>
                         </div>
 
@@ -262,6 +263,71 @@
 
 
                         </div>
+
+                    </div>
+
+                </div>
+
+                <div id="alarmsSettings" class="tabDiv text-start h-100 pt-2 pb-2" style="display:none;">
+
+                    <div class="d-flex flex-column h-100" style="overflow:hidden;">
+
+                    <div class="flex-shrink-0">
+
+                    <ul class="nav nav-pills nav-justified mb-0" id="alarms-tab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active btn-sm py-1" id="add-alarm-tab"
+                                data-bs-toggle="pill" data-bs-target="#add-alarm-pane" type="button" role="tab">+
+                                <span class="alarmTabText">Alarm</span></button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link btn-sm py-1" id="add-nafl-tab"
+                                data-bs-toggle="pill" data-bs-target="#add-nafl-pane" type="button" role="tab">+
+                                <span class="naflTabText">Nafl Alarm</span></button>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content bg-darkish py-3 px-2 mb-2" id="alarms-tabContent">
+
+                        <div class="tab-pane fade show active" id="add-alarm-pane" role="tabpanel">
+                            <select id="alarmSound" class="form-control form-control-sm mb-2"></select>
+                            <select id="alarmFrequency" class="form-control form-control-sm mb-2">
+                                <option value="W" class="weekdaysText">Weekdays</option>
+                                <option value="E" class="everydayText">Everyday</option>
+                            </select>
+                            <div class="d-flex flex-row align-items-center gap-1">
+                                <span class="small">at</span>
+                                <select id="alarmHour" class="form-control form-control-sm p-1"></select>
+                                <span class="small">:</span>
+                                <select id="alarmMinute" class="form-control form-control-sm p-1"></select>
+                                <select id="alarmAp" class="form-control form-control-sm p-1">
+                                    <option value="am">am</option>
+                                    <option value="pm">pm</option>
+                                </select>
+                                <button id="addAlarmButton" type="button"
+                                    class="btn btn-sm btn-warning px-3 ms-auto">+</button>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane fade" id="add-nafl-pane" role="tabpanel">
+                            <select id="naflSound" class="form-control form-control-sm mb-2"></select>
+                            <select id="naflVakit" class="form-control form-control-sm mb-2"></select>
+                            <div class="d-flex flex-row align-items-center gap-1">
+                                <select id="naflMinutes" class="form-control form-control-sm p-1"></select>
+                                <select id="naflWhen" class="form-control form-control-sm p-1">
+                                    <option value="before" class="beforeText">before</option>
+                                    <option value="after" class="afterText">after</option>
+                                </select>
+                                <button id="addNaflButton" type="button"
+                                    class="btn btn-sm btn-success px-3 ms-auto">+</button>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    </div>
+
+                    <div id="alarmsList" class="flex-grow-1 csb pe-1" style="overflow-y:auto; min-height:0;"></div>
 
                     </div>
 
