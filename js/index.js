@@ -9,9 +9,6 @@ $(function () {
     maybeShowCalcAngleNotice();
 });
 
-/* one-time (v2.0.20): tell affected users their calculation angles were updated
-   and that any manual time offsets were reset. The service-worker migration sets
-   the calcAngleNotice flag; it stays until the user closes the banner. */
 const maybeShowCalcAngleNotice = async () => {
     const { calcAngleNotice } = await chrome.storage.local.get(['calcAngleNotice']);
     if (!calcAngleNotice) return;
@@ -454,11 +451,6 @@ const saveAppDataAndRefresh = (appData) => {
     });
 }
 
-/* Shrink the top-bar address font so the location label always fits the space
-   left between the menu icons and the current-time badge. That space varies with
-   the icon state and with the time width (12h "12:34 PM" vs 24h "13:34"), so it
-   is measured fresh each refresh: reset to the stylesheet size, then step down
-   until the (up to 20-char) text fits, down to a readable floor. */
 const fitAddressFontSize = () => {
     const el = document.getElementById('addressMenuText');
     if (!el) return;
@@ -473,8 +465,6 @@ const fitAddressFontSize = () => {
         - (timeEl ? timeEl.offsetWidth : 0)
         - gap;
     if (avail <= 0) return;
-    // Measure true content width without the max-width clamp, starting from the
-    // stylesheet size, and shrink by half-pixels until it fits (min 8px).
     const prevMaxWidth = el.style.maxWidth;
     el.style.maxWidth = 'none';
     el.style.fontSize = '';
@@ -893,8 +883,6 @@ const initAlarmControls = () => {
         $('#naflVakit').html(naflVakits.map(v => `<option value="${v.value}" class="${v.i18n}">${(appData.i18n && appData.i18n[v.i18n]) || v.value}</option>`).join(''));
     }
 
-    /* Nafl minutes ("15 min") — (re)build with the translated unit when the
-       display language changes; the number prefix rules out class-based i18n. */
     let lang = (appData && appData.i18n && appData.i18n.languageCode) || '';
     if (lang !== initAlarmControls.lang) {
         initAlarmControls.lang = lang;

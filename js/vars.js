@@ -50,11 +50,8 @@ const adhanAudios = [
 	{ id: 102, name: 'Soft Beep Sound (0:01)', isFajrAdhan: true, isAdhan: true, isAlarm: true },
 ];
 
-/* Alarm sounds: short tones suitable for a wake-up / reminder alarm. */
 const alarmSounds = adhanAudios.filter(a => a.isAlarm);
-/* Nafl prayer alarm sounds: short tones plus the full adhan recitations. */
 const naflSounds = [...alarmSounds, ...adhanAudios.filter(a => !a.isAlarm)];
-/* Vakits (and night fractions) a nafl prayer alarm can be anchored to. */
 const naflVakits = [
 	{ value: 'Fajr', i18n: 'fajrText' },
 	{ value: 'Sunrise', i18n: 'sunriseText' },
@@ -97,9 +94,6 @@ const imsakDefaultOffset = -10;
 const duhaDefaultOffset = 15;
 const duhaendDefaultOffset = -10;
 
-/* Methods whose twilight angles / method offsets changed in v2.0.20.
-   Users on these methods get a one-time manual-offset reset + notice,
-   so previously dialed-in corrections don't stack on top of the fix. */
 const calcAngleUpdatedMethods = ['JAKIM', 'KEMENAG'];
 
 const settingsCodeFields = ['address', 'calculationMethod', 'adhans', 'timeZoneID', 'lat', 'lng', 'areAdhansEnabled',

@@ -31,8 +31,6 @@ let clockFaceVakit;
 
 const r = 160;
 const ir = 12;
-/* Render the toolbar icon/bar at high resolution (38px is the toolbar size) so the
-   popup's "Icon Style" previews — which show these same images ~40px — stay crisp. */
 const iconSize = 128;
 const colors = { black: '#212529', silver: 'whitesmoke', tomato: '#F20031', gray: '#2E3338' };
 const ctx = new OffscreenCanvas(470, 470).getContext("2d", { alpha: true, willReadFrequently: true });
@@ -167,10 +165,6 @@ async function initUser(i18nValues, appData) {
                 appData.settings.naflAlarms = [];
             }
 
-            /* one-time (v2.0.20): twilight angles / method offsets for some calculation
-               methods were corrected. A manual offset dialed in to compensate the old
-               values would now double-correct the result, so reset offsets once for
-               affected users and leave a notice for the popup to surface. */
             if (!appData.settings.calcAngleFixApplied) {
                 appData.settings.calcAngleFixApplied = true;
                 if (calcAngleUpdatedMethods.includes(appData.settings.calculationMethod)) {
@@ -847,9 +841,6 @@ function drawArrow(canvas, angle, x, width, height, color) {
     canvas.restore();
 }
 
-/* Mark each defined alarm on the clock ring at its time, using the alarm-type
-   colour (Alarm = amber, Nafl Alarm = green) — the same colours as the alarm
-   tabs, buttons and list dots. Positions use the 12-hour dial like the hands. */
 function markAlarms(canvas, r) {
 
     let alarms = appData.settings.alarms || [];
@@ -926,11 +917,6 @@ async function callAdhan() {
     }
 }
 
-/* Alarms & Nafl prayer alarms. Fixed alarms fire at a set clock time (every day
-   or weekdays only); nafl alarms fire a number of minutes before/after a vakit or
-   a night fraction. Unlike azans, an alarm exists only because the user set it, so
-   it always fires regardless of the "Enable Adhan Calls" switch — to stop getting
-   one, remove it. They share the adhan audio pipeline and the same stop button. */
 function checkAlarms() {
 
     let alarms = appData.settings.alarms || [];

@@ -18,10 +18,6 @@ body {
     height: 579px;
 }
 
-/* Let the card body be clamped to its flex allotment instead of growing to fit
-   its content (default min-height:auto). Without this, a long alarms list pushes
-   the body past the fixed card height and the overflow is clipped/unreachable;
-   with it, the alarms tab's own scroll region (#alarmsList) takes over. */
 #topCard > .card-body {
     min-height: 0;
 }
@@ -48,8 +44,6 @@ body {
     user-select: none;
 }
 
-/* Icon Style previews use the high-res (128px) toolbar icon/bar images; size them
-   down for display so the buttons stay compact. */
 #iconImg,
 #barImg {
     height: 36px;
@@ -61,9 +55,6 @@ body {
     height: 27px;
 }
 
-/* Alarm bell notification badge: a small red dot on the bell's top-right, shown
-   when any alarm is set (instead of recolouring the whole bell). The ring is the
-   header background colour so the dot stays crisp where it meets the bell. */
 #menu-div-alarms {
     position: relative;
 }
@@ -152,8 +143,6 @@ body {
     background-color: #198754;
 }
 
-/* Empty-state tip on the alarm page: a soft amber callout with a hanging indent
-   (the lightbulb sits left, wrapped text lines align under the text). */
 .alarm-tip {
     background-color: rgba(255, 193, 7, 0.1);
     border-inline-start: 3px solid #ffc107;
@@ -163,9 +152,6 @@ body {
     text-align: start;
 }
 
-/* Alarm / Nafl-alarm tabs: the active tab shares the content panel's surface so
-   the two read as one connected box, marked with a gold top accent; the inactive
-   tab recedes with a muted colour. */
 #alarms-tab {
     gap: 2px;
 }
@@ -187,9 +173,6 @@ body {
     color: whitesmoke;
     font-weight: 600;
     background-color: #31373E;
-    /* Trace the outline of the connected tab+panel shape with a subtle border.
-       border-bottom is dropped and the tab is pulled 1px over the panel so its
-       matching background hides the panel's top border beneath the active tab. */
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-bottom: 0;
     position: relative;
@@ -203,8 +186,6 @@ body {
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* Alarm / nafl entries in the list: a subtle border to lift each card off the
-   dark body, matching the alarm form's outline. */
 .alarm-card {
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
