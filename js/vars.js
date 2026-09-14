@@ -100,3 +100,156 @@ const settingsCodeFields = ['address', 'calculationMethod', 'adhans', 'timeZoneI
 	'adhans', 'vakitOffsets', 'timeFormat', 'showMidnight', 'showDuha', 'showImsak', 'hanafiAsr',
 	'desktopNotifications', 'volume'
 ];
+
+/* --- Calendar tab: Islamic (Hijri) holy days & localization --- */
+
+/* Hijri month/day for each holy day. Month numbers follow the islamic-umalqura
+   calendar used elsewhere in the app (1 = Muharram ... 9 = Ramadan ... 12 = Dhu al-Hijjah). */
+const islamicHolidays = [
+	{ key: 'hijriNewYear', month: 1, day: 1, emoji: '🌙' },
+	{ key: 'ashura', month: 1, day: 10, emoji: '🕌' },
+	{ key: 'mawlid', month: 3, day: 12, emoji: '💚' },
+	{ key: 'israMiraj', month: 7, day: 27, emoji: '🕌' },
+	{ key: 'midShaban', month: 8, day: 15, emoji: '🌙' },
+	{ key: 'ramadanStart', month: 9, day: 1, emoji: '🌟' },
+	{ key: 'laylatAlQadr', month: 9, day: 27, emoji: '✨' },
+	{ key: 'eidAlFitr', month: 10, day: 1, emoji: '🎉' },
+	{ key: 'arafah', month: 12, day: 9, emoji: '🕌' },
+	{ key: 'eidAlAdha', month: 12, day: 10, emoji: '🐏' }
+];
+
+/* Calendar UI + holy-day names. English (en) is the guaranteed fallback; any
+   language without an entry (or a missing key) falls back to English. Gregorian
+   and Hijri month/weekday names are localized automatically via Intl. */
+const calendarLocale = {
+	en: {
+		calendarTitle: 'Calendar', upcomingHolydays: 'Upcoming Holy Days',
+		today: 'Today', tomorrow: 'Tomorrow', inDays: 'in {n} days',
+		noUpcoming: 'No upcoming holy days',
+		hijriNewYear: 'Islamic New Year', ashura: 'Day of Ashura',
+		mawlid: "Mawlid (Prophet's Birthday)", israMiraj: "Isra and Mi'raj",
+		midShaban: "Mid-Sha'ban", ramadanStart: 'First Day of Ramadan',
+		laylatAlQadr: 'Laylat al-Qadr', eidAlFitr: 'Eid al-Fitr',
+		arafah: 'Day of Arafah', eidAlAdha: 'Eid al-Adha'
+	},
+	ar: {
+		calendarTitle: 'التقويم', upcomingHolydays: 'الأيام المباركة القادمة',
+		today: 'اليوم', tomorrow: 'غدًا', inDays: 'بعد {n} يوم',
+		noUpcoming: 'لا توجد أيام مباركة قادمة',
+		hijriNewYear: 'رأس السنة الهجرية', ashura: 'يوم عاشوراء',
+		mawlid: 'المولد النبوي', israMiraj: 'الإسراء والمعراج',
+		midShaban: 'ليلة النصف من شعبان', ramadanStart: 'أول أيام رمضان',
+		laylatAlQadr: 'ليلة القدر', eidAlFitr: 'عيد الفطر',
+		arafah: 'يوم عرفة', eidAlAdha: 'عيد الأضحى'
+	},
+	tr: {
+		calendarTitle: 'Takvim', upcomingHolydays: 'Yaklaşan Mübarek Günler',
+		today: 'Bugün', tomorrow: 'Yarın', inDays: '{n} gün sonra',
+		noUpcoming: 'Yaklaşan mübarek gün yok',
+		hijriNewYear: 'Hicri Yılbaşı', ashura: 'Aşure Günü',
+		mawlid: 'Mevlid Kandili', israMiraj: 'İsra ve Miraç',
+		midShaban: 'Berat Kandili', ramadanStart: "Ramazan'ın İlk Günü",
+		laylatAlQadr: 'Kadir Gecesi', eidAlFitr: 'Ramazan Bayramı',
+		arafah: 'Arefe Günü', eidAlAdha: 'Kurban Bayramı'
+	},
+	de: {
+		calendarTitle: 'Kalender', upcomingHolydays: 'Kommende Feiertage',
+		today: 'Heute', tomorrow: 'Morgen', inDays: 'in {n} Tagen',
+		noUpcoming: 'Keine bevorstehenden Feiertage',
+		hijriNewYear: 'Islamisches Neujahr', ashura: 'Aschura-Tag',
+		mawlid: 'Mawlid (Geburtstag des Propheten)', israMiraj: 'Isra und Miradsch',
+		midShaban: 'Mitte Schaban', ramadanStart: 'Erster Tag des Ramadan',
+		laylatAlQadr: 'Laylat al-Qadr (Nacht der Bestimmung)', eidAlFitr: 'Eid al-Fitr (Fest des Fastenbrechens)',
+		arafah: 'Tag von Arafat', eidAlAdha: 'Eid al-Adha (Opferfest)'
+	},
+	fr: {
+		calendarTitle: 'Calendrier', upcomingHolydays: 'Fêtes à venir',
+		today: "Aujourd'hui", tomorrow: 'Demain', inDays: 'dans {n} jours',
+		noUpcoming: 'Aucune fête à venir',
+		hijriNewYear: 'Nouvel An hégirien', ashura: "Jour de l'Achoura",
+		mawlid: 'Mawlid (naissance du Prophète)', israMiraj: 'Isra et Miraj',
+		midShaban: 'Mi-Chaabane', ramadanStart: 'Premier jour du Ramadan',
+		laylatAlQadr: 'Laylat al-Qadr (Nuit du Destin)', eidAlFitr: 'Aïd el-Fitr',
+		arafah: "Jour d'Arafat", eidAlAdha: 'Aïd el-Adha'
+	},
+	es: {
+		calendarTitle: 'Calendario', upcomingHolydays: 'Próximas fiestas sagradas',
+		today: 'Hoy', tomorrow: 'Mañana', inDays: 'en {n} días',
+		noUpcoming: 'No hay fiestas próximas',
+		hijriNewYear: 'Año Nuevo islámico', ashura: 'Día de la Ashura',
+		mawlid: 'Mawlid (Nacimiento del Profeta)', israMiraj: "Isra y Mi'ray",
+		midShaban: "Mitad de Sha'bán", ramadanStart: 'Primer día del Ramadán',
+		laylatAlQadr: 'Laylat al-Qadr (Noche del Destino)', eidAlFitr: 'Eid al-Fitr',
+		arafah: 'Día de Arafat', eidAlAdha: 'Eid al-Adha'
+	},
+	it: {
+		calendarTitle: 'Calendario', upcomingHolydays: 'Prossime festività',
+		today: 'Oggi', tomorrow: 'Domani', inDays: 'tra {n} giorni',
+		noUpcoming: 'Nessuna festività in arrivo',
+		hijriNewYear: 'Capodanno islamico', ashura: "Giorno dell'Ashura",
+		mawlid: 'Mawlid (Nascita del Profeta)', israMiraj: "Isra e Mi'raj",
+		midShaban: "Metà di Sha'ban", ramadanStart: 'Primo giorno del Ramadan',
+		laylatAlQadr: 'Laylat al-Qadr (Notte del Destino)', eidAlFitr: 'Eid al-Fitr',
+		arafah: 'Giorno di Arafat', eidAlAdha: 'Eid al-Adha'
+	},
+	nl: {
+		calendarTitle: 'Kalender', upcomingHolydays: 'Aankomende feestdagen',
+		today: 'Vandaag', tomorrow: 'Morgen', inDays: 'over {n} dagen',
+		noUpcoming: 'Geen aankomende feestdagen',
+		hijriNewYear: 'Islamitisch Nieuwjaar', ashura: 'Asjoera',
+		mawlid: 'Mawlid (geboortedag van de Profeet)', israMiraj: "Isra en Mi'raj",
+		midShaban: "Halverwege Sha'ban", ramadanStart: 'Eerste dag van de Ramadan',
+		laylatAlQadr: 'Laylat al-Qadr (Nacht van de Beschikking)', eidAlFitr: 'Eid al-Fitr (Suikerfeest)',
+		arafah: 'Dag van Arafat', eidAlAdha: 'Eid al-Adha (Offerfeest)'
+	},
+	pt: {
+		calendarTitle: 'Calendário', upcomingHolydays: 'Próximas datas sagradas',
+		today: 'Hoje', tomorrow: 'Amanhã', inDays: 'em {n} dias',
+		noUpcoming: 'Nenhuma data sagrada próxima',
+		hijriNewYear: 'Ano Novo Islâmico', ashura: 'Dia de Ashura',
+		mawlid: 'Mawlid (Nascimento do Profeta)', israMiraj: 'Isra e Miraj',
+		midShaban: "Metade de Sha'ban", ramadanStart: 'Primeiro dia do Ramadã',
+		laylatAlQadr: 'Laylat al-Qadr (Noite do Destino)', eidAlFitr: 'Eid al-Fitr',
+		arafah: 'Dia de Arafat', eidAlAdha: 'Eid al-Adha'
+	},
+	id: {
+		calendarTitle: 'Kalender', upcomingHolydays: 'Hari Besar Mendatang',
+		today: 'Hari ini', tomorrow: 'Besok', inDays: 'dalam {n} hari',
+		noUpcoming: 'Tidak ada hari besar mendatang',
+		hijriNewYear: 'Tahun Baru Hijriah', ashura: 'Hari Asyura',
+		mawlid: 'Maulid Nabi', israMiraj: 'Isra Mikraj',
+		midShaban: 'Nisfu Syaban', ramadanStart: 'Hari Pertama Ramadan',
+		laylatAlQadr: 'Lailatulqadar', eidAlFitr: 'Idulfitri',
+		arafah: 'Hari Arafah', eidAlAdha: 'Iduladha'
+	},
+	ms: {
+		calendarTitle: 'Kalendar', upcomingHolydays: 'Hari Kebesaran Akan Datang',
+		today: 'Hari ini', tomorrow: 'Esok', inDays: 'dalam {n} hari',
+		noUpcoming: 'Tiada hari kebesaran akan datang',
+		hijriNewYear: 'Tahun Baru Hijrah', ashura: 'Hari Asyura',
+		mawlid: 'Maulidur Rasul', israMiraj: 'Israk Mikraj',
+		midShaban: 'Nisfu Syaaban', ramadanStart: 'Hari Pertama Ramadan',
+		laylatAlQadr: 'Lailatulqadar', eidAlFitr: 'Hari Raya Aidilfitri',
+		arafah: 'Hari Arafah', eidAlAdha: 'Hari Raya Aidiladha'
+	},
+	ru: {
+		calendarTitle: 'Календарь', upcomingHolydays: 'Предстоящие священные дни',
+		today: 'Сегодня', tomorrow: 'Завтра', inDays: 'через {n} дн.',
+		noUpcoming: 'Нет предстоящих священных дней',
+		hijriNewYear: 'Исламский Новый год', ashura: 'День Ашура',
+		mawlid: 'Мавлид (рождение Пророка)', israMiraj: 'Исра и Мирадж',
+		midShaban: 'Ночь середины Шаабана', ramadanStart: 'Первый день Рамадана',
+		laylatAlQadr: 'Ляйлят аль-Кадр (Ночь предопределения)', eidAlFitr: 'Ид аль-Фитр (Ураза-байрам)',
+		arafah: 'День Арафа', eidAlAdha: 'Ид аль-Адха (Курбан-байрам)'
+	},
+	fa: {
+		calendarTitle: 'تقویم', upcomingHolydays: 'مناسبت‌های پیش رو',
+		today: 'امروز', tomorrow: 'فردا', inDays: '{n} روز دیگر',
+		noUpcoming: 'مناسبتی پیش رو نیست',
+		hijriNewYear: 'سال نو هجری قمری', ashura: 'عاشورا',
+		mawlid: 'میلاد پیامبر', israMiraj: 'اسرا و معراج',
+		midShaban: 'نیمه شعبان', ramadanStart: 'نخستین روز ماه رمضان',
+		laylatAlQadr: 'شب قدر', eidAlFitr: 'عید فطر',
+		arafah: 'روز عرفه', eidAlAdha: 'عید قربان'
+	}
+};

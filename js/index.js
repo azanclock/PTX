@@ -113,6 +113,9 @@ const runApp = async () => {
 
     setFields();
 
+    if ($('#calendarTab').is(':visible') && !$('#calDays').children().length)
+        renderCalendar();
+
 }
 
 $(function () {
@@ -150,6 +153,33 @@ $(function () {
         $('#alarmsSettings').show();
         $('#footer').hide();
         displayAlarms();
+    });
+
+    $(".menu-calendar").click(function (e) {
+        $('.menu-div').removeClass('bg-secondary');
+        $('#menu-div-calendar').addClass('bg-secondary');
+        $('.tabDiv').hide();
+        $('#calendarTab').show();
+        $('#footer').hide();
+        const now = new Date();
+        calViewDate = new Date(now.getFullYear(), now.getMonth(), 1);
+        renderCalendar();
+    });
+
+    $('#calPrev').click(function () {
+        calViewDate = new Date(calViewDate.getFullYear(), calViewDate.getMonth() - 1, 1);
+        renderCalendar();
+    });
+
+    $('#calNext').click(function () {
+        calViewDate = new Date(calViewDate.getFullYear(), calViewDate.getMonth() + 1, 1);
+        renderCalendar();
+    });
+
+    $('#calTitle').click(function () {
+        const now = new Date();
+        calViewDate = new Date(now.getFullYear(), now.getMonth(), 1);
+        renderCalendar();
     });
 
     $("#calculationMethod").change(function () {
@@ -451,32 +481,6 @@ const saveAppDataAndRefresh = (appData) => {
     });
 }
 
-const fitAddressFontSize = () => {
-    const el = document.getElementById('addressMenuText');
-    if (!el) return;
-    const rightGroup = el.parentElement;
-    const row = rightGroup && rightGroup.parentElement;
-    if (!row) return;
-    const leftGroup = row.firstElementChild;
-    const timeEl = rightGroup.querySelector('.timeNowTitle');
-    const gap = parseFloat(getComputedStyle(rightGroup).columnGap) || 0;
-    const avail = row.clientWidth
-        - (leftGroup ? leftGroup.offsetWidth : 0)
-        - (timeEl ? timeEl.offsetWidth : 0)
-        - gap;
-    if (avail <= 0) return;
-    const prevMaxWidth = el.style.maxWidth;
-    el.style.maxWidth = 'none';
-    el.style.fontSize = '';
-    let fontPx = parseFloat(getComputedStyle(el).fontSize) || 12;
-    const minPx = 8;
-    while (el.offsetWidth > avail && fontPx > minPx) {
-        fontPx -= 0.5;
-        el.style.fontSize = fontPx + 'px';
-    }
-    el.style.maxWidth = prevMaxWidth;
-};
-
 const setFields = async () => {
 
     $('#stopAdhanDiv').hide();
@@ -489,11 +493,10 @@ const setFields = async () => {
     if (!$('#basicSettings').is(':visible'))
         $('#address').val(appData.settings.address);
 
-    let topAddressMaxLen = 20;
+    let topAddressMaxLen = 14;
     let topAddress = appData.settings.address.substring(0, topAddressMaxLen).trimEnd() + ((appData.settings.address.length > topAddressMaxLen) ? '…' : '');
     $('#addressMenuText').html(topAddress);
     $('.timeNowTitle').html(appData.timeNow).attr('title', 'Current Time in ' + appData.settings.timeZoneID);
-    fitAddressFontSize();
     const calculationMethodEl = document.getElementById('calculationMethod');
     const isCalculationMethodActive = document.activeElement === calculationMethodEl;
     if (!isCalculationMethodActive) {
@@ -911,7 +914,8 @@ const renderAlarmsList = () => {
         let noAlarms = i18n.noAlarmsText || 'No alarms set.';
         let note = i18n.alarmsNoteText || 'Alarms always play, even when adhan calls are off.';
         let bulb = '<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#ffc107" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0; margin-top:3px;"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>';
-        html = `<div class="text-secondary small text-center pt-3 pb-3">${noAlarms}</div>
+        let noneIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#adb5bd" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="8" y1="12" x2="16" y2="12"/></svg>';
+        html = `<div class="alarm-empty small d-flex align-items-center gap-2">${noneIcon}<span>${noAlarms}</span></div>
                 <div class="alarm-tip small d-flex align-items-start gap-2">${bulb}<span>${note}</span></div>`;
     }
 
@@ -1029,3 +1033,259 @@ const hideLoadingOnError = () => {
     $('#loadingImg').attr('src', '/images/x.png');
     setTimeout(() => { $('#loading').hide() }, 500);
 }
+
+/* ---------- Calendar tab: combined Hijri + Gregorian view ---------- */
+
+let calViewDate = null; /* first day of the Gregorian month currently in view */
+
+const calAddDays = (date, n) => {
+    const d = new Date(date);
+    d.setDate(d.getDate() + n);
+    return d;
+};
+
+const calStartOfDay = (date) => {
+    const d = new Date(date);
+    d.setHours(0, 0, 0, 0);
+    return d;
+};
+
+const calLang = () => (appData && appData.i18n && appData.i18n.languageCode) || navigator.language || 'en';
+
+const calHijriOffset = () => (appData && appData.settings && appData.settings.hijriDateOffset) || 0;
+
+const calEsc = (s) => String(s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
+/* Calendar/holy-day strings, with English fallback (see calendarLocale in vars.js). */
+const calT = (key) => {
+    const table = (typeof calendarLocale !== 'undefined') ? calendarLocale : {};
+    const lang = calLang();
+    const base = lang.split(/[-_]/)[0];
+    return (table[lang] && table[lang][key])
+        || (table[base] && table[base][key])
+        || (table.en && table.en[key])
+        || key;
+};
+
+/* Hijri (islamic-umalqura) components for a date, as integers. Uses the 'en'
+   locale so digits are always ASCII and safe to parse. */
+const calGetHijriParts = (date) => {
+    const parts = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura',
+        { day: 'numeric', month: 'numeric', year: 'numeric' }).formatToParts(date);
+    const o = {};
+    for (const p of parts) {
+        if (p.type === 'year') o.hy = parseInt(p.value.replace(/[^0-9]/g, ''), 10);
+        else if (p.type === 'month') o.hm = parseInt(p.value, 10);
+        else if (p.type === 'day') o.hd = parseInt(p.value, 10);
+    }
+    return o;
+};
+
+/* Localized number (e.g. Arabic-Indic digits for ar/fa), without digit grouping
+   so years render as "1448" rather than "1,448". */
+const calNum = (n) => {
+    try { return new Intl.NumberFormat(calLang(), { useGrouping: false }).format(n); }
+    catch (e) { return String(n); }
+};
+
+/* Localized Hijri month name for the Hijri month that `date` falls in. */
+const calHijriMonthName = (date, style) => {
+    try {
+        return new Intl.DateTimeFormat(calLang() + '-u-ca-islamic-umalqura', { month: style }).format(date);
+    } catch (e) {
+        return new Intl.DateTimeFormat('en-u-ca-islamic-umalqura', { month: style }).format(date);
+    }
+};
+
+/* Full localized Hijri date string, e.g. "10 Muharram 1449". `offset` shifts the
+   Hijri reckoning to stay consistent with the rest of the app (hijriDateOffset). */
+const calHijriDateString = (date, offset) => {
+    const d = calAddDays(date, offset);
+    try {
+        return new Intl.DateTimeFormat(calLang() + '-u-ca-islamic-umalqura',
+            { day: 'numeric', month: 'long', year: 'numeric' }).format(d);
+    } catch (e) {
+        return new Intl.DateTimeFormat('en-u-ca-islamic-umalqura',
+            { day: 'numeric', month: 'long', year: 'numeric' }).format(d);
+    }
+};
+
+/* Convert a Hijri (year, month, day) to the Gregorian Date on which it falls,
+   matched against the same islamic-umalqura calendar the app uses. */
+const calHijriToGregorian = (hy, hm, hd) => {
+    const targetTotal = (hy - 1) * 354.367 + (hm - 1) * 29.53 + hd;
+    let guess = new Date();
+    guess.setHours(12, 0, 0, 0);
+    for (let i = 0; i < 6; i++) {
+        const p = calGetHijriParts(guess);
+        const gt = (p.hy - 1) * 354.367 + (p.hm - 1) * 29.53 + p.hd;
+        const diff = Math.round(targetTotal - gt);
+        if (diff === 0) break;
+        guess = calAddDays(guess, diff);
+    }
+    for (let off = 0; off <= 20; off++) {
+        const steps = off === 0 ? [0] : [off, -off];
+        for (const s of steps) {
+            const d = calAddDays(guess, s);
+            const p = calGetHijriParts(d);
+            if (p.hy === hy && p.hm === hm && p.hd === hd) return calStartOfDay(d);
+        }
+    }
+    return null;
+};
+
+/* First day of the week for a locale (JS convention: 0 = Sunday ... 6 = Saturday). */
+const calFirstDayOfWeek = (lang) => {
+    try {
+        const loc = new Intl.Locale(lang);
+        const wi = (typeof loc.getWeekInfo === 'function') ? loc.getWeekInfo() : loc.weekInfo;
+        if (wi && wi.firstDay) return wi.firstDay % 7; /* ISO 1..7 (Mon..Sun) -> 0..6 (Sun..Sat) */
+    } catch (e) { /* fall through */ }
+    return 0;
+};
+
+const calDateKey = (d) => d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+
+const renderCalendar = () => {
+    if (!appData || !appData.i18n) return;
+    if (!calViewDate) {
+        const now = new Date();
+        calViewDate = new Date(now.getFullYear(), now.getMonth(), 1);
+    }
+
+    const lang = calLang();
+    const offset = calHijriOffset();
+    const viewYear = calViewDate.getFullYear();
+    const viewMonth = calViewDate.getMonth();
+
+    const firstOfMonth = new Date(viewYear, viewMonth, 1);
+    const lastOfMonth = new Date(viewYear, viewMonth + 1, 0);
+
+    /* --- Title: Gregorian month/year + the Hijri month(s) spanning it --- */
+    const gregTitle = new Intl.DateTimeFormat(lang, { month: 'long', year: 'numeric' }).format(firstOfMonth);
+    const hFirst = calGetHijriParts(calAddDays(firstOfMonth, offset));
+    const hLast = calGetHijriParts(calAddDays(lastOfMonth, offset));
+    const hNameFirst = calHijriMonthName(calAddDays(firstOfMonth, offset), 'long');
+    let hijriTitle;
+    if (hFirst.hm === hLast.hm && hFirst.hy === hLast.hy) {
+        hijriTitle = hNameFirst + ' ' + calNum(hFirst.hy);
+    } else {
+        const hNameLast = calHijriMonthName(calAddDays(lastOfMonth, offset), 'long');
+        if (hFirst.hy === hLast.hy)
+            hijriTitle = hNameFirst + ' – ' + hNameLast + ' ' + calNum(hLast.hy);
+        else
+            hijriTitle = hNameFirst + ' ' + calNum(hFirst.hy) + ' – ' + hNameLast + ' ' + calNum(hLast.hy);
+    }
+    $('#calTitle').html('<div class="cal-title-greg">' + calEsc(gregTitle) + '</div>'
+        + '<div class="cal-title-hijri">' + calEsc(hijriTitle) + '</div>');
+    $('#calTitle').attr('title', calT('today'));
+
+    /* --- Weekday header --- */
+    const firstDow = calFirstDayOfWeek(lang);
+    const weekdayFmt = new Intl.DateTimeFormat(lang, { weekday: 'short' });
+    const knownSunday = new Date(2023, 0, 1); /* Jan 1 2023 was a Sunday */
+    let wkHtml = '';
+    for (let i = 0; i < 7; i++) {
+        const dow = (firstDow + i) % 7;
+        wkHtml += '<div>' + calEsc(weekdayFmt.format(calAddDays(knownSunday, dow))) + '</div>';
+    }
+    $('#calWeekdays').html(wkHtml);
+
+    /* --- Day grid (6 weeks) --- */
+    const lead = (firstOfMonth.getDay() - firstDow + 7) % 7;
+    const gridStart = calAddDays(firstOfMonth, -lead);
+    const today = calStartOfDay(new Date());
+
+    let daysHtml = '';
+    for (let i = 0; i < 42; i++) {
+        const d = calStartOfDay(calAddDays(gridStart, i));
+        const h = calGetHijriParts(calAddDays(d, offset));
+        const isOther = d.getMonth() !== viewMonth;
+        const isToday = d.getTime() === today.getTime();
+        const holy = islamicHolidays.find(x => x.month === h.hm && x.day === h.hd);
+
+        /* Show the Hijri month (short) when a new Hijri month starts, else the day. */
+        const hijriDisplay = (h.hd === 1)
+            ? calHijriMonthName(calAddDays(d, offset), 'short')
+            : calNum(h.hd);
+
+        let cls = 'cal-day';
+        if (isOther) cls += ' other-month';
+        if (isToday) cls += ' today';
+        if (h.hd === 1) cls += ' cal-hijri-month-start';
+        if (holy) cls += ' holyday';
+
+        const title = holy ? ' title="' + calEsc(calT(holy.key)) + '"' : '';
+        daysHtml += '<div class="' + cls + '"' + title + '>'
+            + (holy ? '<span class="cal-dot"></span>' : '')
+            + '<span class="cal-greg">' + d.getDate() + '</span>'
+            + '<span class="cal-hijri">' + calEsc(hijriDisplay) + '</span>'
+            + '</div>';
+    }
+    $('#calDays').html(daysHtml);
+
+    renderUpcomingHolydays();
+};
+
+/* Future holy days (today onward), next occurrence of each, sorted by date. */
+const renderUpcomingHolydays = () => {
+    const lang = calLang();
+    const offset = calHijriOffset();
+    const today = calStartOfDay(new Date());
+    const todayH = calGetHijriParts(calAddDays(today, offset));
+
+    let items = [];
+    for (const hy of [todayH.hy, todayH.hy + 1]) {
+        for (const hol of islamicHolidays) {
+            const base = calHijriToGregorian(hy, hol.month, hol.day);
+            if (!base) continue;
+            const gd = calStartOfDay(calAddDays(base, -offset));
+            const daysRemaining = Math.round((gd.getTime() - today.getTime()) / 86400000);
+            if (daysRemaining < 0) continue;
+            items.push({ hol, date: gd, daysRemaining });
+        }
+    }
+
+    items.sort((a, b) => a.daysRemaining - b.daysRemaining);
+
+    /* Keep only the soonest future occurrence of each holy day. */
+    const seen = {};
+    const upcoming = [];
+    for (const it of items) {
+        if (seen[it.hol.key]) continue;
+        seen[it.hol.key] = true;
+        upcoming.push(it);
+    }
+
+    $('#calUpcomingTitle').text(calT('upcomingHolydays'));
+
+    if (!upcoming.length) {
+        $('#calUpcoming').html('<div class="cal-upcoming-empty">' + calEsc(calT('noUpcoming')) + '</div>');
+        return;
+    }
+
+    const gregFmt = new Intl.DateTimeFormat(lang, { day: 'numeric', month: 'short', year: 'numeric' });
+    let html = '';
+    for (const it of upcoming) {
+        const name = calT(it.hol.key);
+        const gregStr = gregFmt.format(it.date);
+        const hijriStr = calHijriDateString(it.date, offset);
+
+        let remaining, remClass = '';
+        if (it.daysRemaining === 0) { remaining = calT('today'); remClass = ' remaining-today'; }
+        else if (it.daysRemaining === 1) { remaining = calT('tomorrow'); }
+        else { remaining = calT('inDays').replace('{n}', calNum(it.daysRemaining)); }
+
+        const soon = it.daysRemaining <= 7 ? ' is-soon' : '';
+        html += '<div class="cal-holyday-item' + soon + '">'
+            + '<div class="cal-holyday-emoji">' + it.hol.emoji + '</div>'
+            + '<div class="cal-holyday-info">'
+            + '<div class="cal-holyday-name">' + calEsc(name) + '</div>'
+            + '<div class="cal-holyday-dates">' + calEsc(gregStr) + ' · ' + calEsc(hijriStr) + '</div>'
+            + '</div>'
+            + '<div class="cal-holyday-remaining' + remClass + '">' + calEsc(remaining) + '</div>'
+            + '</div>';
+    }
+    $('#calUpcoming').html(html);
+};

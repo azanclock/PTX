@@ -45,6 +45,9 @@
                             <img id="alarmMenuIcon" class="menu-img" src="images/alarm.svg" />
                             <span id="alarmDot" class="alarm-badge" style="display:none;"></span>
                         </div>
+                        <div id="menu-div-calendar" class="menu-div menu-calendar pointerOn rounded">
+                            <img class="menu-img" src="images/calendar.svg" />
+                        </div>
                     </div>
 
                     <div id="stopAdhanDiv" class="pointerOn rounded" style="background-color: #F20031; display:none;">
@@ -84,6 +87,30 @@
                                 <span id="remainingForIftar" class="badge bg-success text-light"></span>
                             </div>
                         </div>
+
+                    </div>
+
+                </div>
+
+                <div id="calendarTab" class="tabDiv text-center h-100" style="display:none;">
+
+                    <div class="d-flex flex-column h-100" style="overflow:hidden;">
+
+                        <div class="cal-nav d-flex flex-row align-items-center justify-content-between gap-1 flex-shrink-0">
+                            <button id="calPrev" type="button" class="btn btn-darkish btn-sm cal-nav-btn"
+                                aria-label="Previous month">‹</button>
+                            <div id="calTitle" class="cal-title pointerOn flex-fill"></div>
+                            <button id="calNext" type="button" class="btn btn-darkish btn-sm cal-nav-btn"
+                                aria-label="Next month">›</button>
+                        </div>
+
+                        <div id="calWeekdays" class="cal-grid cal-weekdays flex-shrink-0"></div>
+
+                        <div id="calDays" class="cal-grid cal-days flex-shrink-0"></div>
+
+                        <div id="calUpcomingTitle" class="cal-upcoming-title flex-shrink-0"></div>
+
+                        <div id="calUpcoming" class="cal-upcoming flex-grow-1 csb pe-1"></div>
 
                     </div>
 
