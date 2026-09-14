@@ -1282,7 +1282,10 @@ const renderUpcomingHolydays = () => {
             + '<div class="cal-holyday-emoji">' + it.hol.emoji + '</div>'
             + '<div class="cal-holyday-info">'
             + '<div class="cal-holyday-name">' + calEsc(name) + '</div>'
-            + '<div class="cal-holyday-dates">' + calEsc(gregStr) + ' · ' + calEsc(hijriStr) + '</div>'
+            + '<div class="cal-holyday-dates">'
+            + '<div class="cal-holyday-greg">' + calEsc(gregStr) + '</div>'
+            + '<div class="cal-holyday-hijri">' + calEsc(hijriStr) + '</div>'
+            + '</div>'
             + '</div>'
             + '<div class="cal-holyday-remaining' + remClass + '">' + calEsc(remaining) + '</div>'
             + '</div>';
