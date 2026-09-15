@@ -59,10 +59,14 @@ const runApp = async () => {
         $('#remainingForIftar').html(appData.remainingForIftar).show();
     }
 
-    Object.entries(appData.i18n).forEach(function ([key, value]) {
-        $('#' + key).text(value);
-        $('.' + key).text(value);
-    });
+    let langCode = (appData.i18n && appData.i18n.languageCode) || '';
+    if (langCode !== runApp.appliedLang) {
+        runApp.appliedLang = langCode;
+        Object.entries(appData.i18n).forEach(function ([key, value]) {
+            $('#' + key).text(value);
+            $('.' + key).text(value);
+        });
+    }
 
     $('.vakitDiv').hide();
     for (let i = 0; i < appData.appVakits.length; i++) {
@@ -205,6 +209,17 @@ $(function () {
                         iconUrl: 'images/icons/128.png',
                         title: appData.i18n['desktopNotificationsOnTitle'],
                         message: appData.settings.address
+                    },
+                    () => {
+                        /* the "image" type is unsupported on macOS and fails silently; fall back to a basic notification */
+                        if (chrome.runtime.lastError) {
+                            chrome.notifications.create('test', {
+                                type: "basic",
+                                iconUrl: 'images/icons/128.png',
+                                title: appData.i18n['desktopNotificationsOnTitle'],
+                                message: appData.settings.address
+                            });
+                        }
                     }
                 );
                 chrome.storage.local.set({ 'lastAlert': 'settingUpdate' });

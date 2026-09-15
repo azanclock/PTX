@@ -640,6 +640,17 @@ function extensionOps() {
                         iconUrl: 'images/icons/128.png',
                         title: nextText,
                         message: appData.settings.address
+                    },
+                    () => {
+                        /* the "image" type is unsupported on macOS and fails silently; fall back to a basic notification */
+                        if (chrome.runtime.lastError) {
+                            chrome.notifications.create('notification', {
+                                type: "basic",
+                                iconUrl: 'images/icons/128.png',
+                                title: nextText,
+                                message: appData.settings.address
+                            });
+                        }
                     }
                 );
             }
@@ -841,6 +852,26 @@ function drawArrow(canvas, angle, x, width, height, color) {
     canvas.restore();
 }
 
+/* Minutes from now until this alarm next actually rings, honoring its frequency
+   (E = every day, W = weekdays). Returns Infinity if it never fires. */
+function minutesUntilNextAlarm(a) {
+    let nowMinutes = currentTime.getHours() * 60 + currentTime.getMinutes();
+    let parts = a.time.split(':');
+    let alarmMinutes = parts[0] * 60 + parts[1] * 1;
+    let today = currentTime.getDay(); /* 0=Sun .. 6=Sat */
+
+    for (let d = 0; d <= 7; d++) {
+        let weekday = (today + d) % 7;
+        let fires = (a.frequency === 'E') || (a.frequency === 'W' && weekday > 0 && weekday < 6);
+        if (!fires)
+            continue;
+        let delta = d * 1440 + alarmMinutes - nowMinutes;
+        if (delta >= 0)
+            return delta;
+    }
+    return Infinity;
+}
+
 function markAlarms(canvas, r) {
 
     let alarms = appData.settings.alarms || [];
@@ -850,10 +881,12 @@ function markAlarms(canvas, r) {
         return;
 
     let markerRadius = r * 1.19;
-    let isWeekDay = currentTime.getDay() > 0 && currentTime.getDay() < 6;
 
+    /* The clock face is a 12h dial, so a 9:30am and a 9:30pm alarm would land on
+       the exact same spot. Only show the dot while the alarm is the next thing due
+       within 12h, so its position always matches when it will actually ring. */
     alarms.forEach((a) => {
-        if ((a.frequency === 'E') || (a.frequency === 'W' && isWeekDay))
+        if (minutesUntilNextAlarm(a) <= 720)
             drawIndicator(canvas, markerRadius, timeToRadians(a.time, 12), '#ffc107');
     });
 
