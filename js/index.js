@@ -609,10 +609,10 @@ const setFields = async () => {
 
     $('#audioVolumeIcon').attr('src', 'images/audio-' + appData.settings.volume + '.png');
     $('#audioVolumeDiv').attr('title', 'Audio Volume: ' + appData.settings.volume);
-    if (appData.settings.areAdhansEnabled)
-        $('#volume').attr('disabled', false);
-    else
-        $('#volume').attr('disabled', true);
+    /* Volume applies to both adhan and alarm audio (see callAlarm in
+       serviceWorker.js), so keep the slider enabled even when adhan calls are
+       disabled — alarms may still be on. */
+    $('#volume').attr('disabled', false);
     if (!$('#adhanOffsetSettings').is(':visible'))
         displayAdhansAndOffsets();
 
@@ -1150,6 +1150,20 @@ const calHijriToGregorian = (hy, hm, hd) => {
     return null;
 };
 
+/* Resolve a holiday's Hijri day-of-month for a given Hijri year. Most entries
+   carry a fixed `day`; an entry with `firstWeekday` instead (0 = Sunday ... 6 =
+   Saturday) falls on the first such weekday of its month, so its Hijri day shifts
+   from year to year — e.g. Laylat al-Raghaib, the first Friday night of Rajab. */
+const calHolidayDay = (hol, hy) => {
+    if (typeof hol.day === 'number') return hol.day;
+    if (typeof hol.firstWeekday === 'number') {
+        const first = calHijriToGregorian(hy, hol.month, 1);
+        if (!first) return null;
+        return 1 + ((hol.firstWeekday - first.getDay() + 7) % 7);
+    }
+    return null;
+};
+
 /* First day of the week for a locale (JS convention: 0 = Sunday ... 6 = Saturday). */
 const calFirstDayOfWeek = (lang) => {
     try {
@@ -1218,7 +1232,7 @@ const renderCalendar = () => {
         const h = calGetHijriParts(calAddDays(d, offset));
         const isOther = d.getMonth() !== viewMonth;
         const isToday = d.getTime() === today.getTime();
-        const holy = islamicHolidays.find(x => x.month === h.hm && x.day === h.hd);
+        const holy = islamicHolidays.find(x => x.month === h.hm && calHolidayDay(x, h.hy) === h.hd);
 
         /* Show the Hijri month (short) when a new Hijri month starts, else the day. */
         const hijriDisplay = (h.hd === 1)
@@ -1253,7 +1267,9 @@ const renderUpcomingHolydays = () => {
     let items = [];
     for (const hy of [todayH.hy, todayH.hy + 1]) {
         for (const hol of islamicHolidays) {
-            const base = calHijriToGregorian(hy, hol.month, hol.day);
+            const hd = calHolidayDay(hol, hy);
+            if (!hd) continue;
+            const base = calHijriToGregorian(hy, hol.month, hd);
             if (!base) continue;
             const gd = calStartOfDay(calAddDays(base, -offset));
             const daysRemaining = Math.round((gd.getTime() - today.getTime()) / 86400000);

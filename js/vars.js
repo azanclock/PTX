@@ -109,11 +109,17 @@ const islamicHolidays = [
 	{ key: 'hijriNewYear', month: 1, day: 1, emoji: '🌙' },
 	{ key: 'ashura', month: 1, day: 10, emoji: '🕌' },
 	{ key: 'mawlid', month: 3, day: 12, emoji: '🌹' },
+	{ key: 'rajabStart', month: 7, day: 1, emoji: '🌙' },
+	/* Laylat al-Raghaib: first Friday night of Rajab — its Hijri day varies by
+	   year, so it is resolved from firstWeekday (5 = Friday) at render time. */
+	{ key: 'laylatAlRaghaib', month: 7, firstWeekday: 5, emoji: '🤲' },
 	{ key: 'israMiraj', month: 7, day: 27, emoji: '🕌' },
-	{ key: 'midShaban', month: 8, day: 15, emoji: '🌙' },
+	{ key: 'midShaban', month: 8, day: 15, emoji: '🌕' },
 	{ key: 'ramadanStart', month: 9, day: 1, emoji: '🌟' },
 	{ key: 'laylatAlQadr', month: 9, day: 27, emoji: '✨' },
 	{ key: 'eidAlFitr', month: 10, day: 1, emoji: '🎉' },
+	{ key: 'dhulHijjahStart', month: 12, day: 1, emoji: '🌙' },
+	{ key: 'tarwiyah', month: 12, day: 8, emoji: '🕋' },
 	{ key: 'arafah', month: 12, day: 9, emoji: '🕌' },
 	{ key: 'eidAlAdha', month: 12, day: 10, emoji: '🐏' }
 ];
@@ -128,8 +134,10 @@ const calendarLocale = {
 		noUpcoming: 'No upcoming holy days',
 		hijriNewYear: 'Islamic New Year', ashura: 'Day of Ashura',
 		mawlid: "Mawlid (Prophet's Birthday ﷺ)", israMiraj: "Isra and Mi'raj",
+		rajabStart: 'First Day of Rajab', laylatAlRaghaib: 'Laylat al-Raghaib',
 		midShaban: "Mid-Sha'ban", ramadanStart: 'First Day of Ramadan',
 		laylatAlQadr: 'Laylat al-Qadr', eidAlFitr: 'Eid al-Fitr',
+		dhulHijjahStart: 'First Day of Dhu al-Hijjah', tarwiyah: 'Day of Tarwiyah',
 		arafah: 'Day of Arafah', eidAlAdha: 'Eid al-Adha'
 	},
 	ar: {
@@ -138,8 +146,10 @@ const calendarLocale = {
 		noUpcoming: 'لا توجد أيام مباركة قادمة',
 		hijriNewYear: 'رأس السنة الهجرية', ashura: 'يوم عاشوراء',
 		mawlid: 'المولد النبوي ﷺ', israMiraj: 'الإسراء والمعراج',
+		rajabStart: 'أول أيام رجب', laylatAlRaghaib: 'ليلة الرغائب',
 		midShaban: 'ليلة النصف من شعبان', ramadanStart: 'أول أيام رمضان',
 		laylatAlQadr: 'ليلة القدر', eidAlFitr: 'عيد الفطر',
+		dhulHijjahStart: 'أول أيام ذي الحجة', tarwiyah: 'يوم التروية',
 		arafah: 'يوم عرفة', eidAlAdha: 'عيد الأضحى'
 	},
 	tr: {
@@ -148,8 +158,10 @@ const calendarLocale = {
 		noUpcoming: 'Yaklaşan mübarek gün yok',
 		hijriNewYear: 'Hicri Yılbaşı', ashura: 'Aşure Günü',
 		mawlid: 'Mevlid Kandili ﷺ', israMiraj: 'İsra ve Miraç',
+		rajabStart: "Recep'in İlk Günü", laylatAlRaghaib: 'Regaib Kandili',
 		midShaban: 'Berat Kandili', ramadanStart: "Ramazan'ın İlk Günü",
 		laylatAlQadr: 'Kadir Gecesi', eidAlFitr: 'Ramazan Bayramı',
+		dhulHijjahStart: "Zilhicce'nin İlk Günü", tarwiyah: 'Terviye Günü',
 		arafah: 'Arefe Günü', eidAlAdha: 'Kurban Bayramı'
 	},
 	de: {
@@ -158,8 +170,10 @@ const calendarLocale = {
 		noUpcoming: 'Keine bevorstehenden Feiertage',
 		hijriNewYear: 'Islamisches Neujahr', ashura: 'Aschura-Tag',
 		mawlid: 'Mawlid (Geburtstag des Propheten ﷺ)', israMiraj: 'Isra und Miradsch',
+		rajabStart: 'Erster Tag des Radschab', laylatAlRaghaib: 'Laylat al-Raghaib (Nacht der Wünsche)',
 		midShaban: 'Mitte Schaban', ramadanStart: 'Erster Tag des Ramadan',
 		laylatAlQadr: 'Laylat al-Qadr (Nacht der Bestimmung)', eidAlFitr: 'Eid al-Fitr (Fest des Fastenbrechens)',
+		dhulHijjahStart: 'Erster Tag des Dhu al-Hidscha', tarwiyah: 'Tag von Tarwiya',
 		arafah: 'Tag von Arafat', eidAlAdha: 'Eid al-Adha (Opferfest)'
 	},
 	fr: {
@@ -168,8 +182,10 @@ const calendarLocale = {
 		noUpcoming: 'Aucune fête à venir',
 		hijriNewYear: 'Nouvel An hégirien', ashura: "Jour de l'Achoura",
 		mawlid: 'Mawlid (naissance du Prophète ﷺ)', israMiraj: 'Isra et Miraj',
+		rajabStart: 'Premier jour de Rajab', laylatAlRaghaib: 'Laylat al-Raghaib (Nuit des Souhaits)',
 		midShaban: 'Mi-Chaabane', ramadanStart: 'Premier jour du Ramadan',
 		laylatAlQadr: 'Laylat al-Qadr (Nuit du Destin)', eidAlFitr: 'Aïd el-Fitr',
+		dhulHijjahStart: 'Premier jour de Dhou al-Hijja', tarwiyah: 'Jour de Tarwiyah',
 		arafah: "Jour d'Arafat", eidAlAdha: 'Aïd el-Adha'
 	},
 	es: {
@@ -178,8 +194,10 @@ const calendarLocale = {
 		noUpcoming: 'No hay fiestas próximas',
 		hijriNewYear: 'Año Nuevo islámico', ashura: 'Día de la Ashura',
 		mawlid: 'Mawlid (Nacimiento del Profeta ﷺ)', israMiraj: "Isra y Mi'ray",
+		rajabStart: 'Primer día de Rayab', laylatAlRaghaib: 'Laylat al-Raghaib (Noche de los Deseos)',
 		midShaban: "Mitad de Sha'bán", ramadanStart: 'Primer día del Ramadán',
 		laylatAlQadr: 'Laylat al-Qadr (Noche del Destino)', eidAlFitr: 'Eid al-Fitr',
+		dhulHijjahStart: 'Primer día de Dhu al-Hiyyah', tarwiyah: 'Día de Tarwiya',
 		arafah: 'Día de Arafat', eidAlAdha: 'Eid al-Adha'
 	},
 	it: {
@@ -188,8 +206,10 @@ const calendarLocale = {
 		noUpcoming: 'Nessuna festività in arrivo',
 		hijriNewYear: 'Capodanno islamico', ashura: "Giorno dell'Ashura",
 		mawlid: 'Mawlid (Nascita del Profeta ﷺ)', israMiraj: "Isra e Mi'raj",
+		rajabStart: 'Primo giorno di Rajab', laylatAlRaghaib: 'Laylat al-Raghaib (Notte dei Desideri)',
 		midShaban: "Metà di Sha'ban", ramadanStart: 'Primo giorno del Ramadan',
 		laylatAlQadr: 'Laylat al-Qadr (Notte del Destino)', eidAlFitr: 'Eid al-Fitr',
+		dhulHijjahStart: 'Primo giorno di Dhu al-Hijja', tarwiyah: 'Giorno di Tarwiya',
 		arafah: 'Giorno di Arafat', eidAlAdha: 'Eid al-Adha'
 	},
 	nl: {
@@ -198,8 +218,10 @@ const calendarLocale = {
 		noUpcoming: 'Geen aankomende feestdagen',
 		hijriNewYear: 'Islamitisch Nieuwjaar', ashura: 'Asjoera',
 		mawlid: 'Mawlid (geboortedag van de Profeet ﷺ)', israMiraj: "Isra en Mi'raj",
+		rajabStart: 'Eerste dag van Rajab', laylatAlRaghaib: 'Laylat al-Raghaib (Nacht van de Wensen)',
 		midShaban: "Halverwege Sha'ban", ramadanStart: 'Eerste dag van de Ramadan',
 		laylatAlQadr: 'Laylat al-Qadr (Nacht van de Beschikking)', eidAlFitr: 'Eid al-Fitr (Suikerfeest)',
+		dhulHijjahStart: 'Eerste dag van Dhu al-Hijja', tarwiyah: 'Dag van Tarwiyah',
 		arafah: 'Dag van Arafat', eidAlAdha: 'Eid al-Adha (Offerfeest)'
 	},
 	pt: {
@@ -208,8 +230,10 @@ const calendarLocale = {
 		noUpcoming: 'Nenhuma data sagrada próxima',
 		hijriNewYear: 'Ano Novo Islâmico', ashura: 'Dia de Ashura',
 		mawlid: 'Mawlid (Nascimento do Profeta ﷺ)', israMiraj: 'Isra e Miraj',
+		rajabStart: 'Primeiro dia de Rajab', laylatAlRaghaib: 'Laylat al-Raghaib (Noite dos Desejos)',
 		midShaban: "Metade de Sha'ban", ramadanStart: 'Primeiro dia do Ramadã',
 		laylatAlQadr: 'Laylat al-Qadr (Noite do Destino)', eidAlFitr: 'Eid al-Fitr',
+		dhulHijjahStart: 'Primeiro dia de Dhul-Hijjah', tarwiyah: 'Dia de Tarwiyah',
 		arafah: 'Dia de Arafat', eidAlAdha: 'Eid al-Adha'
 	},
 	id: {
@@ -218,8 +242,10 @@ const calendarLocale = {
 		noUpcoming: 'Tidak ada hari besar mendatang',
 		hijriNewYear: 'Tahun Baru Hijriah', ashura: 'Hari Asyura',
 		mawlid: 'Maulid Nabi ﷺ', israMiraj: 'Isra Mikraj',
+		rajabStart: 'Hari Pertama Rajab', laylatAlRaghaib: 'Lailatulragaib',
 		midShaban: 'Nisfu Syaban', ramadanStart: 'Hari Pertama Ramadan',
 		laylatAlQadr: 'Lailatulqadar', eidAlFitr: 'Idulfitri',
+		dhulHijjahStart: 'Hari Pertama Zulhijah', tarwiyah: 'Hari Tarwiyah',
 		arafah: 'Hari Arafah', eidAlAdha: 'Iduladha'
 	},
 	ms: {
@@ -228,8 +254,10 @@ const calendarLocale = {
 		noUpcoming: 'Tiada hari kebesaran akan datang',
 		hijriNewYear: 'Tahun Baru Hijrah', ashura: 'Hari Asyura',
 		mawlid: 'Maulidur Rasul ﷺ', israMiraj: 'Israk Mikraj',
+		rajabStart: 'Hari Pertama Rejab', laylatAlRaghaib: 'Lailaturagaib',
 		midShaban: 'Nisfu Syaaban', ramadanStart: 'Hari Pertama Ramadan',
 		laylatAlQadr: 'Lailatulqadar', eidAlFitr: 'Hari Raya Aidilfitri',
+		dhulHijjahStart: 'Hari Pertama Zulhijah', tarwiyah: 'Hari Tarwiah',
 		arafah: 'Hari Arafah', eidAlAdha: 'Hari Raya Aidiladha'
 	},
 	ru: {
@@ -238,8 +266,10 @@ const calendarLocale = {
 		noUpcoming: 'Нет предстоящих священных дней',
 		hijriNewYear: 'Исламский Новый год', ashura: 'День Ашура',
 		mawlid: 'Мавлид (рождение Пророка ﷺ)', israMiraj: 'Исра и Мирадж',
+		rajabStart: 'Первый день Раджаба', laylatAlRaghaib: 'Ляйлят ар-Рагаиб (Ночь желаний)',
 		midShaban: 'Ночь середины Шаабана', ramadanStart: 'Первый день Рамадана',
 		laylatAlQadr: 'Ляйлят аль-Кадр (Ночь предопределения)', eidAlFitr: 'Ид аль-Фитр (Ураза-байрам)',
+		dhulHijjahStart: 'Первый день Зуль-хиджа', tarwiyah: 'День Тарвия',
 		arafah: 'День Арафа', eidAlAdha: 'Ид аль-Адха (Курбан-байрам)'
 	},
 	fa: {
@@ -248,8 +278,10 @@ const calendarLocale = {
 		noUpcoming: 'مناسبتی پیش رو نیست',
 		hijriNewYear: 'سال نو هجری قمری', ashura: 'عاشورا',
 		mawlid: 'میلاد پیامبر ﷺ', israMiraj: 'اسرا و معراج',
+		rajabStart: 'نخستین روز ماه رجب', laylatAlRaghaib: 'شب رغائب',
 		midShaban: 'نیمه شعبان', ramadanStart: 'نخستین روز ماه رمضان',
 		laylatAlQadr: 'شب قدر', eidAlFitr: 'عید فطر',
+		dhulHijjahStart: 'نخستین روز ماه ذی‌الحجه', tarwiyah: 'روز ترویه',
 		arafah: 'روز عرفه', eidAlAdha: 'عید قربان'
 	}
 };
