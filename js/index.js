@@ -503,7 +503,7 @@ const setFields = async () => {
         $('#stopAdhanDiv').show();
 
     let hasAlarms = (appData.settings.alarms && appData.settings.alarms.length) || (appData.settings.naflAlarms && appData.settings.naflAlarms.length);
-    $('#alarmDot').toggle(!!hasAlarms);
+    $('#alarmMenuIcon').attr('src', hasAlarms ? 'images/alarm-active.svg' : 'images/alarm.svg');
 
     if (!$('#basicSettings').is(':visible'))
         $('#address').val(appData.settings.address);
