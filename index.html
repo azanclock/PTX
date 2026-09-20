@@ -58,6 +58,11 @@
                         </div>
                         <div id="addressMenuText" class="menu-text badge bg-light text-dark menu-settings pointerOn">
                         </div>
+                        <span class="adhansToggle pointerOn d-flex align-items-center"
+                            title="Azan audio on / off — tap to change" style="line-height:1; padding-left:2px;">
+                            <img class="adhan-on" src="images/audio-on.png" style="height:18px; display:none;" />
+                            <img class="adhan-off" src="images/audio-off.png" style="height:18px; display:none;" />
+                        </span>
                     </div>
 
                 </div>
@@ -65,13 +70,7 @@
             </div>
             <div class="card-body py-0 px-3">
 
-                <div id="times" class="tabDiv text-center" style="position:relative;">
-
-                    <span class="adhansToggle pointerOn" title="Azan audio on / off — tap to change"
-                        style="position:absolute; top:2px; right:-4px; z-index:5; line-height:1;">
-                        <img class="adhan-on" src="images/audio-on.png" style="height:18px; display:none;" />
-                        <img class="adhan-off" src="images/audio-off.png" style="height:18px; display:none;" />
-                    </span>
+                <div id="times" class="tabDiv text-center">
 
                     <img class="align-center img-fluid mt-2" id="clock" />
 
@@ -281,14 +280,14 @@
                                 </button>
                             </div>
 
-                            <div>
-                                <button id="reviewButton" title="Review" class="btn btn-primary p-1 text-light btn-sm">
-                                    <img src="images/review.png" class="img-fluid" />
+                            <div class="col-2">
+                                <button id="infoIcon" title="About &amp; more from us"
+                                    class="btn btn-secondary col-12 p-1 btn-sm">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
                                 </button>
                             </div>
-
-
-
                         </div>
 
                     </div>
@@ -301,7 +300,7 @@
 
                     <div class="flex-shrink-0">
 
-                    <ul class="nav nav-pills nav-justified mb-0" id="alarms-tab" role="tablist">
+                    <ul class="nav nav-pills nav-justified" id="alarms-tab" role="tablist">
                         <li class="nav-item" role="presentation">
                             <button class="nav-link active btn-sm py-1" id="add-alarm-tab"
                                 data-bs-toggle="pill" data-bs-target="#add-alarm-pane" type="button" role="tab">+
@@ -314,7 +313,7 @@
                         </li>
                     </ul>
 
-                    <div class="tab-content bg-darkish py-3 px-2 mb-2" id="alarms-tabContent">
+                    <div class="tab-content py-2 px-2 mb-2" id="alarms-tabContent">
 
                         <div class="tab-pane fade show active" id="add-alarm-pane" role="tabpanel">
                             <select id="alarmSound" class="form-control form-control-sm mb-2"></select>
@@ -323,7 +322,7 @@
                                 <option value="E" class="everydayText">Everyday</option>
                             </select>
                             <div class="d-flex flex-row align-items-center gap-1">
-                                <span class="small">at</span>
+                                <span class="small" style="padding-inline-end:5px;">at</span>
                                 <select id="alarmHour" class="form-control form-control-sm p-1"></select>
                                 <span class="small">:</span>
                                 <select id="alarmMinute" class="form-control form-control-sm p-1"></select>
@@ -358,6 +357,27 @@
 
                     </div>
 
+                </div>
+
+                <div id="infoTab" class="tabDiv text-start h-100 pt-2" style="display:none;">
+                    <div class="d-flex flex-column h-100 csb pe-1" style="overflow-y:auto; min-height:0;">
+                        <div class="info-thanks">
+                            <div class="info-thanks-title">Thank you! 🌙</div>
+                            <div class="info-thanks-text">Thanks for using our Prayer Times extension. For any
+                                questions or suggestions, contact us at <a href="mailto:info@azanclock.com"
+                                    class="info-inline-link">info@azanclock.com</a>.</div>
+                            <a href="https://chromewebstore.google.com/detail/prayer-times-chrome-exten/fbkmgnkliklgbmanjkmiihkdioepnkce/reviews"
+                                target="_blank" rel="noopener" class="info-review-btn">Leave a review</a>
+                        </div>
+                        <div class="info-section-label">More from us</div>
+                        <a href="https://azanclock.com" target="_blank" rel="noopener" class="info-link info-link-photo-card">
+                            <img src="images/azan-clock.jpg" alt="AzanClock device" class="info-link-photo" />
+                        </a>
+                        <a href="https://zakattracker.com" target="_blank" rel="noopener" class="info-link info-link-row">
+                            <img src="images/zakattracker-logo.png" alt="ZakatTracker" class="info-link-logo-sm" />
+                            <div class="info-link-title">Calculate and track your zakat easily</div>
+                        </a>
+                    </div>
                 </div>
 
             </div>

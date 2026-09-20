@@ -599,6 +599,26 @@ function updateBar(canvas, r) {
     return this;
 }
 
+/* Create a desktop notification.
+   On macOS, Chrome hands the notification to the system Notification Center,
+   which silently drops the rich "image" type WITHOUT setting
+   chrome.runtime.lastError — so an image notification simply never appears and
+   no error-based fallback can catch it. Use a plain "basic" notification on
+   macOS; keep the image (with a basic fallback) on Windows/Linux where it
+   renders correctly. */
+function showNotification(id, title, message) {
+    chrome.notifications.clear(id);
+    let base = { iconUrl: 'images/icons/128.png', title: title, message: message };
+    if (navigator.userAgent.includes('Macintosh')) {
+        chrome.notifications.create(id, Object.assign({ type: 'basic' }, base));
+        return;
+    }
+    chrome.notifications.create(id, Object.assign({ type: 'image', imageUrl: 'images/notification.jpg' }, base), () => {
+        if (chrome.runtime.lastError)
+            chrome.notifications.create(id, Object.assign({ type: 'basic' }, base));
+    });
+}
+
 function extensionOps() {
 
     let isRamadan = false;
@@ -631,28 +651,7 @@ function extensionOps() {
             }
             else {
                 chrome.storage.local.set({ 'lastAlert': lastAlertString });
-                chrome.notifications.clear('notification');
-                chrome.notifications.create(
-                    'notification',
-                    {
-                        type: "image",
-                        imageUrl: 'images/notification.jpg',
-                        iconUrl: 'images/icons/128.png',
-                        title: nextText,
-                        message: appData.settings.address
-                    },
-                    () => {
-                        /* the "image" type is unsupported on macOS and fails silently; fall back to a basic notification */
-                        if (chrome.runtime.lastError) {
-                            chrome.notifications.create('notification', {
-                                type: "basic",
-                                iconUrl: 'images/icons/128.png',
-                                title: nextText,
-                                message: appData.settings.address
-                            });
-                        }
-                    }
-                );
+                showNotification('notification', nextText, appData.settings.address);
             }
 
         });

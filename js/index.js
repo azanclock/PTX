@@ -1,6 +1,26 @@
 let appData = {};
 let adhanStatus = {};
 
+/* Create a desktop notification.
+   On macOS, Chrome hands the notification to the system Notification Center,
+   which silently drops the rich "image" type WITHOUT setting
+   chrome.runtime.lastError — so an image notification simply never appears and
+   no error-based fallback can catch it. Use a plain "basic" notification on
+   macOS; keep the image (with a basic fallback) on Windows/Linux where it
+   renders correctly. */
+function showNotification(id, title, message) {
+    chrome.notifications.clear(id);
+    let base = { iconUrl: 'images/icons/128.png', title: title, message: message };
+    if (navigator.userAgent.includes('Macintosh')) {
+        chrome.notifications.create(id, Object.assign({ type: 'basic' }, base));
+        return;
+    }
+    chrome.notifications.create(id, Object.assign({ type: 'image', imageUrl: 'images/notification.jpg' }, base), () => {
+        if (chrome.runtime.lastError)
+            chrome.notifications.create(id, Object.assign({ type: 'basic' }, base));
+    });
+}
+
 chrome.runtime.onMessage.addListener((msg) => { if ('runApp' in msg) { runApp() } });
 
 $(function () {
@@ -170,6 +190,13 @@ $(function () {
         renderCalendar();
     });
 
+    $("#infoIcon").click(function (e) {
+        $('.menu-div').removeClass('bg-secondary');
+        $('.tabDiv').hide();
+        $('#infoTab').show();
+        $('#footer').hide();
+    });
+
     $('#calPrev').click(function () {
         calViewDate = new Date(calViewDate.getFullYear(), calViewDate.getMonth() - 1, 1);
         renderCalendar();
@@ -201,27 +228,7 @@ $(function () {
             saveAppDataAndRefresh(appData);
             chrome.notifications.clear('test');
             if (appData.settings.desktopNotifications) {
-                chrome.notifications.create(
-                    'test',
-                    {
-                        type: "image",
-                        imageUrl: 'images/notification.jpg',
-                        iconUrl: 'images/icons/128.png',
-                        title: appData.i18n['desktopNotificationsOnTitle'],
-                        message: appData.settings.address
-                    },
-                    () => {
-                        /* the "image" type is unsupported on macOS and fails silently; fall back to a basic notification */
-                        if (chrome.runtime.lastError) {
-                            chrome.notifications.create('test', {
-                                type: "basic",
-                                iconUrl: 'images/icons/128.png',
-                                title: appData.i18n['desktopNotificationsOnTitle'],
-                                message: appData.settings.address
-                            });
-                        }
-                    }
-                );
+                showNotification('test', appData.i18n['desktopNotificationsOnTitle'], appData.settings.address);
                 chrome.storage.local.set({ 'lastAlert': 'settingUpdate' });
             }
         });
@@ -373,10 +380,6 @@ $(function () {
         }, 2000);
     });
 
-    $("#reviewButton").click(function (e) {
-        window.open('https://chromewebstore.google.com/detail/prayer-times-chrome-exten/fbkmgnkliklgbmanjkmiihkdioepnkce/reviews');
-    });
-
     $("#audioPlayerDiv").click(function (e) {
         stopAudio();
     });
@@ -431,12 +434,6 @@ $(function () {
     let tooltipAR = bootstrap.Tooltip.getOrCreateInstance(arb, { trigger: 'hover', customClass: 'custom-red-tooltip' });
     arb.addEventListener('show.bs.tooltip', () => {
         tooltipAR._config.title = 'Reset Version ' + chrome.runtime.getManifest().version;
-    });
-
-    let rvb = document.getElementById('reviewButton');
-    let tooltipRV = bootstrap.Tooltip.getOrCreateInstance(rvb, { trigger: 'hover', customClass: 'custom-tooltip' });
-    rvb.addEventListener('show.bs.tooltip', () => {
-        tooltipRV._config.title = 'Review';
     });
 
 });
@@ -928,10 +925,15 @@ const renderAlarmsList = () => {
         let i18n = (appData && appData.i18n) || {};
         let noAlarms = i18n.noAlarmsText || 'No alarms set.';
         let note = i18n.alarmsNoteText || 'Alarms always play, even when adhan calls are off.';
-        let bulb = '<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#ffc107" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0; margin-top:3px;"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>';
-        let noneIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#adb5bd" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="8" y1="12" x2="16" y2="12"/></svg>';
-        html = `<div class="alarm-empty small d-flex align-items-center gap-2">${noneIcon}<span>${noAlarms}</span></div>
-                <div class="alarm-tip small d-flex align-items-start gap-2">${bulb}<span>${note}</span></div>`;
+        let bulb = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffc107" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>';
+        html = `<div class="alarm-tip small d-flex align-items-start gap-2">
+                    ${bulb}
+                    <div class="flex-grow-1">
+                        <div>${noAlarms}</div>
+                        <hr class="alarm-tip-hr">
+                        <div>${note}</div>
+                    </div>
+                </div>`;
     }
 
     alarms.forEach((a, index) => {
@@ -952,17 +954,14 @@ const renderAlarmsList = () => {
 
 const alarmCard = (dotClass, name, schedule, type, index) => {
     return `
-        <div class="alarm-card bg-darkish rounded px-2 py-2 mb-1">
-            <div class="d-flex flex-row justify-content-between align-items-center gap-2">
-                <div class="text-truncate">
-                    <span class="${dotClass}"></span> <b class="small">${name}</b>
-                    <div class="small text-secondary">${schedule}</div>
-                </div>
-                <div>
-                    <button type="button" class="btn btn-sm btn-danger removeAlarmBtn py-0 px-2"
-                        data-type="${type}" data-index="${index}">&times;</button>
-                </div>
+        <div class="alarm-item">
+            <div class="alarm-item-icon"><span class="${dotClass}"></span></div>
+            <div class="alarm-item-info">
+                <div class="alarm-item-name">${name}</div>
+                <div class="alarm-item-schedule">${schedule}</div>
             </div>
+            <button type="button" class="alarm-item-remove removeAlarmBtn"
+                data-type="${type}" data-index="${index}" aria-label="Remove"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
         </div>`;
 };
 
