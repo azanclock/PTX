@@ -1,6 +1,6 @@
 ﻿{
   "name": {
-    "message": "Gebedstijden met alarmen & Hijri-kalender",
+    "message": "Gebedstijden: Koran, Adhan, alarmen & Hijri-kalender",
     "description": ""
   },
   "short_name": {
@@ -101,6 +101,10 @@
   },
   "adhansAndOffsetsTitle": {
     "message": "Offset-instellingen en Adhans",
+    "description": ""
+  },
+  "audioVolumeTitle": {
+    "message": "Volume van Adhan en Koran",
     "description": ""
   },
   "hijriDateOffsetTitle": {

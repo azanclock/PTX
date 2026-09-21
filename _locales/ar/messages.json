@@ -1,6 +1,6 @@
 ﻿{
   "name": {
-    "message": "مواقيت الصلاة مع التنبيهات والتقويم الهجري",
+    "message": "مواقيت الصلاة: القرآن، الأذان، التنبيهات والتقويم الهجري",
     "description": ""
   },
   "short_name": {
@@ -101,6 +101,10 @@
   },
   "adhansAndOffsetsTitle": {
     "message": "إعدادات التمكين والأذان",
+    "description": ""
+  },
+  "audioVolumeTitle": {
+    "message": "مستوى صوت الأذان والقرآن",
     "description": ""
   },
   "hijriDateOffsetTitle": {

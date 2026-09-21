@@ -1,6 +1,6 @@
 ﻿{
   "name": {
-    "message": "தொழுகை நேரம், அலாரம் & ஹிஜ்ரி நாட்காட்டி",
+    "message": "தொழுகை நேரம்: குர்ஆன், அதான், அலாரம் & ஹிஜ்ரி நாட்காட்டி",
     "description": ""
   },
   "short_name": {
@@ -101,6 +101,10 @@
   },
   "adhansAndOffsetsTitle": {
     "message": "ஆஃப்செட் அமைப்புகள் மற்றும் அசான்",
+    "description": ""
+  },
+  "audioVolumeTitle": {
+    "message": "அசான் & குர்ஆன் ஒலி அளவு",
     "description": ""
   },
   "hijriDateOffsetTitle": {

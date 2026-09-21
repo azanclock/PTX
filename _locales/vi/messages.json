@@ -1,6 +1,6 @@
 ﻿{
   "name": {
-    "message": "Thời gian cầu nguyện với báo thức & lịch Hijri",
+    "message": "Thời gian cầu nguyện: Kinh Qur'an, Azan, báo thức & lịch Hijri",
     "description": ""
   },
   "short_name": {
@@ -101,6 +101,10 @@
   },
   "adhansAndOffsetsTitle": {
     "message": "Cài đặt Bù trừ & Adhan",
+    "description": ""
+  },
+  "audioVolumeTitle": {
+    "message": "Âm lượng Adhan & Kinh Qur'an",
     "description": ""
   },
   "hijriDateOffsetTitle": {

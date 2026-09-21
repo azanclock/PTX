@@ -1,6 +1,6 @@
 ﻿{
   "name": {
-    "message": "Horaires de prière avec alarmes & calendrier hégirien",
+    "message": "Horaires de prière : Coran, Adhan, alarmes & calendrier hégirien",
     "description": ""
   },
   "short_name": {
@@ -101,6 +101,10 @@
   },
   "adhansAndOffsetsTitle": {
     "message": "Paramètres de Décalage et Adhans",
+    "description": ""
+  },
+  "audioVolumeTitle": {
+    "message": "Volume de l'Adhan et du Coran",
     "description": ""
   },
   "hijriDateOffsetTitle": {

@@ -1,6 +1,6 @@
 ﻿{
   "name": {
-    "message": "নামাজের সময়, অ্যালার্ম ও হিজরি ক্যালেন্ডার",
+    "message": "নামাজের সময়: কুরআন, আজান, অ্যালার্ম ও হিজরি ক্যালেন্ডার",
     "description": ""
   },
   "short_name": {
@@ -101,6 +101,10 @@
   },
   "adhansAndOffsetsTitle": {
     "message": "অফসেট সেটিংস এবং আযানসমূহ",
+    "description": ""
+  },
+  "audioVolumeTitle": {
+    "message": "আযান ও কুরআনের ভলিউম",
     "description": ""
   },
   "hijriDateOffsetTitle": {

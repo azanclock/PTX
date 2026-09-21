@@ -1,6 +1,6 @@
 ﻿{
   "name": {
-    "message": "Waktu Sholat dengan Alarm & Kalender Hijriah",
+    "message": "Waktu Sholat: Al-Quran, Azan, Alarm & Kalender Hijriah",
     "description": ""
   },
   "short_name": {
@@ -101,6 +101,10 @@
   },
   "adhansAndOffsetsTitle": {
     "message": "Pengaturan Offset & Adzan",
+    "description": ""
+  },
+  "audioVolumeTitle": {
+    "message": "Volume Adzan & Al-Qur'an",
     "description": ""
   },
   "hijriDateOffsetTitle": {

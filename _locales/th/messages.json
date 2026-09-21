@@ -1,6 +1,6 @@
 ﻿{
   "name": {
-    "message": "เวลาละหมาด พร้อมการแจ้งเตือนและปฏิทินฮิจเราะห์",
+    "message": "เวลาละหมาด: อัลกุรอาน อะซาน การแจ้งเตือน และปฏิทินฮิจเราะห์",
     "description": ""
   },
   "short_name": {
@@ -101,6 +101,10 @@
   },
   "adhansAndOffsetsTitle": {
     "message": "การตั้งค่าออฟเซ็ตและอะซาน",
+    "description": ""
+  },
+  "audioVolumeTitle": {
+    "message": "ระดับเสียงอะซานและอัลกุรอาน",
     "description": ""
   },
   "hijriDateOffsetTitle": {

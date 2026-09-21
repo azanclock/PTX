@@ -1,6 +1,6 @@
 ﻿{
   "name": {
-    "message": "Godziny modlitwy z alarmami i kalendarzem Hidżri",
+    "message": "Godziny modlitwy: Koran, Azan, alarmy i kalendarz Hidżri",
     "description": ""
   },
   "short_name": {
@@ -101,6 +101,10 @@
   },
   "adhansAndOffsetsTitle": {
     "message": "Ustawienia Offsetu i Adhany",
+    "description": ""
+  },
+  "audioVolumeTitle": {
+    "message": "Głośność Adhanu i Koranu",
     "description": ""
   },
   "hijriDateOffsetTitle": {

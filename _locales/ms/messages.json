@@ -1,6 +1,6 @@
 ﻿{
   "name": {
-    "message": "Waktu Solat dengan Penggera & Kalendar Hijrah",
+    "message": "Waktu Solat: Al-Quran, Azan, Penggera & Kalendar Hijrah",
     "description": ""
   },
   "short_name": {
@@ -101,6 +101,10 @@
   },
   "adhansAndOffsetsTitle": {
     "message": "Tetapan Offset & Azan",
+    "description": ""
+  },
+  "audioVolumeTitle": {
+    "message": "Volum Azan & Al-Quran",
     "description": ""
   },
   "hijriDateOffsetTitle": {

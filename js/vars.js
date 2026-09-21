@@ -98,8 +98,39 @@ const calcAngleUpdatedMethods = ['JAKIM', 'KEMENAG'];
 
 const settingsCodeFields = ['address', 'calculationMethod', 'adhans', 'timeZoneID', 'lat', 'lng', 'areAdhansEnabled',
 	'adhans', 'vakitOffsets', 'timeFormat', 'showMidnight', 'showDuha', 'showImsak', 'hanafiAsr',
-	'desktopNotifications', 'volume'
+	'desktopNotifications', 'volume', 'quran'
 ];
+
+/* --- Quran tab UI strings (surah/reciter data live in js/quran-surahs.js & js/quran-reciters.js;
+   audio + reciter-resolution helpers live in js/quran-shared.js). English (en) is the guaranteed
+   fallback, same pattern as calendarLocale — any missing language falls back to English. --- */
+const quranLocale = {
+	en: { title: 'Quran', reciter: 'Reciter', listen: 'Listen', pause: 'Pause', next: 'Next', previous: 'Previous', jumpTo: 'Jump to surah…', markCompleted: 'Mark completed', completed: 'Completed', surah: 'Surah', progress: 'Khatm progress', congrats: "Congratulations on your completion of the Holy Qur'an.", reset: 'Restart', sajda: 'Sajdah', sajdaTip: 'This surah contains a verse of prostration (ayat as-sajdah)' },
+	ar: { title: 'القرآن', reciter: 'القارئ', listen: 'استماع', pause: 'إيقاف', next: 'التالي', previous: 'السابق', jumpTo: 'انتقل إلى سورة…', markCompleted: 'تحديد كمكتمل', completed: 'مكتمل', surah: 'سورة', progress: 'الختمة', congrats: 'تهانينا على ختمك القرآن الكريم.', reset: 'ابدأ من جديد', sajda: 'سجدة', sajdaTip: 'تحتوي هذه السورة على آية سجدة' },
+	tr: { title: "Kur'an", reciter: 'Okuyan', listen: 'Dinle', pause: 'Duraklat', next: 'Sonraki', previous: 'Önceki', jumpTo: 'Sûreye git…', markCompleted: 'Tamamlandı işaretle', completed: 'Tamamlandı', surah: 'Sûre', progress: 'Hatim', congrats: "Kur'an-ı Kerim'i hatmettiğiniz için tebrikler.", reset: 'Yeniden başla', sajda: 'Secde', sajdaTip: 'Bu surede tilavet secdesi âyeti vardır' },
+	/* Other app UI languages: the Restart label is localized here; the rest of the
+	   Qur'an tab still falls back to English (en) in these locales for now. */
+	de: { reset: 'Neu starten' },
+	es: { reset: 'Reiniciar' },
+	fr: { reset: 'Recommencer' },
+	nl: { reset: 'Opnieuw' },
+	it: { reset: 'Ricomincia' },
+	pl: { reset: 'Zacznij od nowa' },
+	pt: { reset: 'Recomeçar' },
+	sv: { reset: 'Börja om' },
+	ru: { reset: 'Начать заново' },
+	vi: { reset: 'Bắt đầu lại' },
+	uk: { reset: 'Почати знову' },
+	fa: { reset: 'شروع دوباره' },
+	hi: { reset: 'फिर से शुरू करें' },
+	bn: { reset: 'আবার শুরু করুন' },
+	ta: { reset: 'மீண்டும் தொடங்கு' },
+	th: { reset: 'เริ่มใหม่' },
+	ko: { reset: '다시 시작' },
+	ja: { reset: '最初から' },
+	id: { reset: 'Mulai lagi' },
+	ms: { reset: 'Mula semula' }
+};
 
 /* --- Calendar tab: Islamic (Hijri) holy days & localization --- */
 

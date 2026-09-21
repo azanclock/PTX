@@ -1,6 +1,6 @@
 ﻿{
   "name": {
-    "message": "Bönetider med larm & Hijri-kalender",
+    "message": "Bönetider: Koran, Adhan, larm & Hijri-kalender",
     "description": ""
   },
   "short_name": {
@@ -101,6 +101,10 @@
   },
   "adhansAndOffsetsTitle": {
     "message": "Offsetinställningar och Adhaner",
+    "description": ""
+  },
+  "audioVolumeTitle": {
+    "message": "Volym för Adhan och Koran",
     "description": ""
   },
   "hijriDateOffsetTitle": {

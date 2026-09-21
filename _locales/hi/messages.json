@@ -1,6 +1,6 @@
 ﻿{
   "name": {
-    "message": "नमाज़ का समय, अलार्म और हिजरी कैलेंडर",
+    "message": "नमाज़ का समय: कुरान, अज़ान, अलार्म और हिजरी कैलेंडर",
     "description": ""
   },
   "short_name": {
@@ -101,6 +101,10 @@
   },
   "adhansAndOffsetsTitle": {
     "message": "ऑफ़सेट सेटिंग्स और अज़ान",
+    "description": ""
+  },
+  "audioVolumeTitle": {
+    "message": "अज़ान और क़ुरआन की आवाज़",
     "description": ""
   },
   "hijriDateOffsetTitle": {

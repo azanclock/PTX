@@ -1,6 +1,6 @@
 ﻿{
   "name": {
-    "message": "Время намаза с будильниками и календарём Хиджры",
+    "message": "Время намаза: Коран, Азан, будильники и календарь Хиджры",
     "description": ""
   },
   "short_name": {
@@ -101,6 +101,10 @@
   },
   "adhansAndOffsetsTitle": {
     "message": "Настройки смещения и азаны",
+    "description": ""
+  },
+  "audioVolumeTitle": {
+    "message": "Громкость азана и Корана",
     "description": ""
   },
   "hijriDateOffsetTitle": {

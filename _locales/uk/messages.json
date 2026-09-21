@@ -1,6 +1,6 @@
 ﻿{
   "name": {
-    "message": "Час молитви з будильниками та календарем Хіджри",
+    "message": "Час молитви: Коран, Азан, будильники та календар Хіджри",
     "description": ""
   },
   "short_name": {
@@ -101,6 +101,10 @@
   },
   "adhansAndOffsetsTitle": {
     "message": "Зміщення часу молитви (хвилини)",
+    "description": ""
+  },
+  "audioVolumeTitle": {
+    "message": "Гучність азану та Корану",
     "description": ""
   },
   "hijriDateOffsetTitle": {

@@ -1,6 +1,6 @@
 ﻿{
   "name": {
-    "message": "Muslim Prayer Times with Alarms & Hijri Calendar",
+    "message": "Muslim Prayer Times: Quran, Adhan, Alarms & Hijri Calendar",
     "description": ""
   },
   "short_name": {
@@ -101,6 +101,10 @@
   },
   "adhansAndOffsetsTitle": {
     "message": "Offsets & Adhans",
+    "description": ""
+  },
+  "audioVolumeTitle": {
+    "message": "Adhan & Qur'an Audio Volume",
     "description": ""
   },
   "hijriDateOffsetTitle": {

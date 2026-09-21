@@ -1,6 +1,6 @@
 ﻿{
   "name": {
-    "message": "기도 시간, 알람 및 히즈리 달력",
+    "message": "기도 시간: 꾸란, 아잔, 알람 및 히즈리 달력",
     "description": ""
   },
   "short_name": {
@@ -101,6 +101,10 @@
   },
   "adhansAndOffsetsTitle": {
     "message": "오프셋 설정 및 아잔",
+    "description": ""
+  },
+  "audioVolumeTitle": {
+    "message": "아잔 및 꾸란 음량",
     "description": ""
   },
   "hijriDateOffsetTitle": {

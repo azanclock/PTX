@@ -1,6 +1,6 @@
 ﻿{
   "name": {
-    "message": "お祈り時間・アラーム・ヒジュラ暦",
+    "message": "お祈り時間・コーラン・アザーン・アラーム・ヒジュラ暦",
     "description": ""
   },
   "short_name": {
@@ -101,6 +101,10 @@
   },
   "adhansAndOffsetsTitle": {
     "message": "オフセット設定とアザーン",
+    "description": ""
+  },
+  "audioVolumeTitle": {
+    "message": "アザーンとクルアーンの音量",
     "description": ""
   },
   "hijriDateOffsetTitle": {

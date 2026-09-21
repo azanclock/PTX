@@ -1,6 +1,6 @@
 ﻿{
   "name": {
-    "message": "Gebetszeiten mit Alarmen & Hidschri-Kalender",
+    "message": "Gebetszeiten: Koran, Adhan, Alarme & Hidschri-Kalender",
     "description": ""
   },
   "short_name": {
@@ -101,6 +101,10 @@
   },
   "adhansAndOffsetsTitle": {
     "message": "Offset-Einstellungen und Gebetsrufe",
+    "description": ""
+  },
+  "audioVolumeTitle": {
+    "message": "Adhan- & Koran-Lautstärke",
     "description": ""
   },
   "hijriDateOffsetTitle": {

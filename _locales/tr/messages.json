@@ -1,6 +1,6 @@
 ﻿{
   "name": {
-    "message": "Namaz Vakitleri, Alarmlar ve Hicri Takvim",
+    "message": "Namaz Vakitleri: Kur'an, Ezan, Alarmlar ve Hicri Takvim",
     "description": ""
   },
   "short_name": {
@@ -101,6 +101,10 @@
   },
   "adhansAndOffsetsTitle": {
     "message": "Temkin Ayarları ve Ezanlar",
+    "description": ""
+  },
+  "audioVolumeTitle": {
+    "message": "Ezan ve Kur'an Ses Düzeyi",
     "description": ""
   },
   "hijriDateOffsetTitle": {

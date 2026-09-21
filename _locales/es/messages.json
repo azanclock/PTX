@@ -1,6 +1,6 @@
 ﻿{
   "name": {
-    "message": "Horarios de oración con alarmas y calendario Hijri",
+    "message": "Horarios de oración: Corán, Adhan, alarmas y calendario Hijri",
     "description": ""
   },
   "short_name": {
@@ -101,6 +101,10 @@
   },
   "adhansAndOffsetsTitle": {
     "message": "Configuración de Desplazamiento y Adhane",
+    "description": ""
+  },
+  "audioVolumeTitle": {
+    "message": "Volumen de Adhan y Corán",
     "description": ""
   },
   "hijriDateOffsetTitle": {

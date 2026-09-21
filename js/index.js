@@ -24,6 +24,7 @@ function showNotification(id, title, message) {
 chrome.runtime.onMessage.addListener((msg) => { if ('runApp' in msg) { runApp() } });
 
 $(function () {
+    applyLatestI18n();
     goGoRun('1stLoad');
     setInterval(goGoRun, 1000);
     maybeShowCalcAngleNotice();
@@ -51,6 +52,22 @@ const maybeShowCalcAngleNotice = async () => {
 const goGoRun = (info) => {
     navigator.serviceWorker.controller.postMessage({ goGoRun: (info ?? '') })
 }
+
+/* Apply the active locale's labels straight from the bundled messages file on popup
+   open, so newly added i18n keys appear without waiting for a service-worker restart
+   to refresh the cached appData.i18n. Local file read; DOM only, no storage write. */
+const applyLatestI18n = async () => {
+    try {
+        const stored = (await chrome.storage.local.get(['appData'])).appData;
+        const lc = (stored && stored.i18n && stored.i18n.languageCode) || '';
+        const lang = languages.some(f => f.code == lc) ? lc : 'en';
+        const data = await (await fetch('_locales/' + lang + '/messages.json')).json();
+        Object.entries(data).forEach(function ([key, value]) {
+            $('#' + key).text(value.message);
+            $('.' + key).text(value.message);
+        });
+    } catch (e) { /* fall back to the cached i18n applied by runApp */ }
+};
 
 const runApp = async () => {
 
@@ -188,6 +205,52 @@ $(function () {
         const now = new Date();
         calViewDate = new Date(now.getFullYear(), now.getMonth(), 1);
         renderCalendar();
+    });
+
+    /* --- Qur'an tab --- */
+    $(".menu-quran").click(function (e) {
+        $('.menu-div').removeClass('bg-secondary');
+        $('#menu-div-quran').addClass('bg-secondary');
+        $('.tabDiv').hide();
+        $('#quranTab').show();
+        $('#footer').hide();
+        renderQuranPlayer();
+    });
+
+    $('#quranToggleBtn').click(() => quranSend({ quranToggle: true }));
+    $('#quranPrevBtn').click(() => quranSend({ quranPrev: true }));
+    $('#quranNextBtn').click(() => quranSend({ quranNext: true }));
+    $('#quranBack10Btn').click(() => quranSkip(-10));
+    $('#quranFwd10Btn').click(() => quranSkip(10));
+    $('#quranProgress').on('input', quranOnScrub).on('change', quranOnSeek);
+    $('#quranSurahCheck').click(function (e) { e.stopPropagation(); quranToggleCompleted(); });
+    $('#quranKhatmReset').click(quranResetKhatm);
+
+    /* header play/pause toggle (visible on every tab) */
+    $('#quranHeaderToggle').click(() => quranSend({ quranToggle: true }));
+    chrome.storage.local.get(['quranState'], (r) => quranUpdateHeaderToggle(!!(r.quranState && r.quranState.isPlaying)));
+
+    /* hide the Qur'an tab + header toggle when there's no internet connection */
+    quranUpdateConnectivity();
+    window.addEventListener('online', quranUpdateConnectivity);
+    window.addEventListener('offline', quranUpdateConnectivity);
+
+    $('#quranReciterBtn').click(quranOpenReciterPicker);
+    $('#quranSurahBtn, #quranSurahArabic').click(quranOpenSurahPicker);
+    $('#quranPickerClose').click(quranCloseReciterPicker);
+    $('#quranSurahPickerClose').click(quranCloseSurahPicker);
+
+    $('#quranReciterList').on('click', '.quran-picker-item', function () {
+        quranSetReciter(this.dataset.id);
+        quranCloseReciterPicker();
+    });
+    $('#quranSurahList').on('click', '.quran-srow-check', function (e) {
+        e.stopPropagation();                                   /* don't also trigger the row (jump) */
+        quranToggleCompleted(parseInt(this.dataset.surah, 10));
+    });
+    $('#quranSurahList').on('click', '.quran-srow', function () {
+        quranSend({ quranPlayFromSurah: parseInt(this.dataset.surah, 10) });
+        quranCloseSurahPicker();
     });
 
     $("#infoIcon").click(function (e) {
@@ -370,6 +433,7 @@ $(function () {
     $("#appResetButton").click(function (e) {
         document.getSelection().removeAllRanges();
         navigator.serviceWorker.controller.postMessage({ endAdhanCall: true });
+        quranSend({ quranStop: true });
         adhanStatus = {};
         showLoading();
         chrome.storage.local.clear();
@@ -477,11 +541,25 @@ document.getElementById('adhanOffsetSettings').addEventListener('change', functi
     }
 });
 
+/* paint the blue fill of the volume bar (value 1–10 → 0–100%), mirroring quranFillBar */
+function volumeFillBar(range) {
+    range = range || document.getElementById('volume');
+    if (!range) return;
+    const min = (+range.min) || 0, max = (+range.max) || 100;
+    const pct = (max > min) ? ((range.value - min) / (max - min)) * 100 : 0;
+    range.style.setProperty('--vol-pct', pct + '%');
+}
+
+document.getElementById('volume').addEventListener('input', function (event) {
+    volumeFillBar(event.target);   /* grow the blue fill live while dragging */
+});
+
 document.getElementById('volume').addEventListener('change', function (event) {
     chrome.storage.local.get(['appData'], function (result) {
         appData = result.appData;
         appData.settings.volume = event.target.value * 1;
         saveAppDataAndRefresh(appData);
+        quranSend({ quranSetVolume: appData.settings.volume });   /* live volume for Qur'an playback */
         playAudio(102);
     });
 });
@@ -621,6 +699,7 @@ const setFields = async () => {
 const displayAdhansAndOffsets = () => {
 
     $('#volume').val(appData.settings.volume);
+    volumeFillBar();   /* paint the blue fill on load/refresh */
 
     $('.offsetCurrentVakit').removeClass('offsetCurrentVakit');
     let adhanVakits = ['imsak', 'fajr', 'duha', 'duhaend', 'dhuhr', 'asr', 'maghrib', 'isha'];
@@ -719,7 +798,7 @@ const displayAdhansAndOffsets = () => {
         /* adhan settings */
         if (appData.settings.adhans.hasOwnProperty(v)) {
             aoContent += `<div class="col-1">`;
-            aoContent += `<img title='${thisAudioTitle}' class="${appData.settings.areAdhansEnabled ? 'adhanRecitorBtn pointerOn' : ''} ms-1 img-fluid" data-name=${v} src="images/mic${appData.settings.areAdhansEnabled ? '' : '-na'}.png"/>`;
+            aoContent += `<img title='${thisAudioTitle}' class="${appData.settings.areAdhansEnabled ? 'adhanRecitorBtn pointerOn' : ''} ms-1 img-fluid" data-name=${v} src="images/mic${appData.settings.areAdhansEnabled ? '.svg' : '-na.png'}"/>`;
             aoContent += `</div>`;
         }
         else {
@@ -802,7 +881,7 @@ const displayAdhansAndOffsets = () => {
 const playAudio = (id) => {
     audioPlayer.src = '/adhans/' + id + '.mp3';
     audioPlayer.volume = appData.settings.volume / 10;
-    $('.playAudioButton').attr('src', '/images/stop.png').addClass('bg-danger');
+    $('.playAudioButton').attr('src', '/images/pause.svg');
     audioPlayer.play();
     $('#audioPlayerDiv').show();
 }
@@ -810,7 +889,7 @@ const playAudio = (id) => {
 const stopAudio = () => {
     audioPlayer.pause();
     audioPlayer.currentTime = 0;
-    $('.playAudioButton').attr('src', '/images/play.png').removeClass('bg-danger');
+    $('.playAudioButton').attr('src', '/images/play.png');
     $('#audioPlayerDiv').hide();
 }
 
@@ -925,7 +1004,7 @@ const renderAlarmsList = () => {
         let i18n = (appData && appData.i18n) || {};
         let noAlarms = i18n.noAlarmsText || 'No alarms set.';
         let note = i18n.alarmsNoteText || 'Alarms always play, even when adhan calls are off.';
-        let bulb = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffc107" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>';
+        let bulb = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#d4af37" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>';
         html = `<div class="alarm-tip small d-flex align-items-start gap-2">
                     ${bulb}
                     <div class="flex-grow-1">
@@ -1322,3 +1401,416 @@ const renderUpcomingHolydays = () => {
     }
     $('#calUpcoming').html(html);
 };
+
+
+/* - - - - - - - - - - Qur'an tab - - - - - - - - - - */
+/* Data: quranSurahs (js/quran-surahs.js), quranReciters (js/quran-reciters.js).
+   Helpers: quranReciter / quranSurahAudioUrl / QURAN_DEFAULT_RECITER (js/quran-shared.js).
+   Playback runs in the service worker + offscreen player. The tab renders the player and
+   reflects quranState / quranCompleted live. Surah + reciter are chosen from full-card
+   picker overlays; the surah picker doubles as the completed-toggle list. */
+
+const quranSend = (msg) => {
+    if (navigator.serviceWorker.controller) navigator.serviceWorker.controller.postMessage(msg);
+};
+
+/* localized UI string with English fallback (see quranLocale in vars.js) */
+const quranT = (key) => {
+    const table = (typeof quranLocale !== 'undefined') ? quranLocale : {};
+    const t = table[calLang()] || table.en || {};
+    return t[key] || (table.en && table.en[key]) || key;
+};
+
+const quranSetText = (id, txt) => { const el = document.getElementById(id); if (el) el.textContent = txt; };
+
+/* m:ss normally; h:mm:ss (e.g. 1:12:34) once we cross an hour. `withHours` forces the
+   hour form so the elapsed + total pair stays aligned when the surah runs over an hour. */
+const quranFmtTime = (sec, withHours) => {
+    sec = Math.max(0, Math.floor(sec || 0));
+    const h = Math.floor(sec / 3600);
+    const m = Math.floor((sec % 3600) / 60);
+    const s = sec % 60;
+    const ss = (s < 10 ? '0' : '') + s;
+    if (withHours || h > 0) return h + ':' + (m < 10 ? '0' : '') + m + ':' + ss;
+    return m + ':' + ss;
+};
+
+const quranReciterName = (id) => {
+    const list = (typeof quranReciters !== 'undefined') ? quranReciters : [];
+    const r = list.find(x => x.identifier === id);
+    return r ? r.englishName : id;
+};
+
+let quranBuilt = false;
+let quranKhatmLoaded = false;
+let quranCurrentSurahNum = 1;
+let quranCurrentReciter = QURAN_DEFAULT_RECITER;
+let quranCompletedSet = new Set();
+let quranScrubbing = false;
+let quranTick = null;
+let quranBase = { time: 0, wall: 0, duration: 0, playing: false };
+let quranLastLabeledSurah = 0;   /* so the title fade-in fires only on an actual surah change */
+let quranTitleShown = false;     /* skip the fade on the first render (no animation when the tab loads) */
+
+/* ---- pickers (surah + reciter), full-card overlays ---- */
+function quranBuildPickers() {
+    const reciters = (typeof quranReciters !== 'undefined') ? quranReciters : [];
+    const rbox = document.getElementById('quranReciterList');
+    if (rbox) rbox.innerHTML = reciters.map(r =>
+        '<button type="button" class="quran-picker-item" data-id="' + calEsc(r.identifier) + '">'
+        + '<span class="quran-picker-item-name">' + calEsc(r.englishName) + '</span>'
+        + '<span class="quran-picker-item-ar">' + calEsc(r.name) + '</span>'
+        + '</button>').join('');
+
+    const surahs = (typeof quranSurahs !== 'undefined') ? quranSurahs : [];
+    const check = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"'
+        + ' stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
+    const hasSajda = (typeof quranSajdaSurahs !== 'undefined') ? quranSajdaSurahs : new Set();
+    const sajdaMark = (n) => hasSajda.has(n)
+        ? '<span class="quran-srow-sajda" title="' + calEsc(quranT('sajdaTip')) + '" aria-label="'
+          + calEsc(quranT('sajdaTip')) + '">۩</span>'
+        : '';
+    const sbox = document.getElementById('quranSurahList');
+    if (sbox) sbox.innerHTML = surahs.map(s =>
+        '<div class="quran-srow" data-surah="' + s.number + '">'
+        + '<span class="quran-srow-num">' + s.number + '</span>'
+        + '<span class="quran-srow-name">' + calEsc(s.englishName) + '</span>'
+        + sajdaMark(s.number)
+        + '<span class="quran-srow-ar">' + calEsc(s.name) + '</span>'
+        + '<button type="button" class="quran-srow-check" data-surah="' + s.number + '" aria-label="'
+        + calEsc(quranT('markCompleted')) + '">' + check + '</button>'
+        + '</div>').join('');
+}
+
+function quranUpdateSurahPickerMarks() {
+    const sbox = document.getElementById('quranSurahList');
+    if (!sbox) return;
+    sbox.querySelectorAll('.quran-srow').forEach(row => {
+        const n = parseInt(row.dataset.surah, 10);
+        row.classList.toggle('current', n === quranCurrentSurahNum);
+        const chk = row.querySelector('.quran-srow-check');
+        if (chk) chk.classList.toggle('done', quranCompletedSet.has(n));
+    });
+}
+
+function quranOpenReciterPicker() {
+    const box = document.getElementById('quranReciterList');
+    if (box) {
+        box.querySelectorAll('.quran-picker-item').forEach(el =>
+            el.classList.toggle('current', el.dataset.id === quranCurrentReciter));
+        const cur = box.querySelector('.quran-picker-item.current');
+        if (cur) cur.scrollIntoView({ block: 'nearest' });
+    }
+    const p = document.getElementById('quranReciterPicker');
+    if (p) p.style.display = 'flex';
+}
+function quranCloseReciterPicker() {
+    const p = document.getElementById('quranReciterPicker');
+    if (p) p.style.display = 'none';
+}
+
+function quranOpenSurahPicker() {
+    quranUpdateSurahPickerMarks();
+    const p = document.getElementById('quranSurahPicker');
+    if (p) p.style.display = 'flex';
+    const cur = document.querySelector('#quranSurahList .quran-srow.current');
+    if (cur) cur.scrollIntoView({ block: 'center' });
+}
+function quranCloseSurahPicker() {
+    const p = document.getElementById('quranSurahPicker');
+    if (p) p.style.display = 'none';
+}
+
+/* ---- labels + progress ---- */
+function quranSetReciterLabel(id) {
+    quranCurrentReciter = id || QURAN_DEFAULT_RECITER;
+    const name = quranReciterName(quranCurrentReciter);
+    quranSetText('quranReciterName', name);
+    const btn = document.getElementById('quranReciterBtn');
+    if (btn) btn.title = quranT('reciter') + ': ' + name;   /* full name also on hover */
+}
+
+function quranSetSurahLabel(n) {
+    const surahs = (typeof quranSurahs !== 'undefined') ? quranSurahs : [];
+    const s = surahs.find(x => x.number === n);
+    quranSetText('quranSurahNumber', String(n));
+    const cap = document.getElementById('quranSurahCaption');
+    if (cap) cap.setAttribute('aria-label', quranT('surah') + ' ' + n);   /* keep the spoken label */
+    quranSetText('quranSurahName', s ? s.englishName : ('Surah ' + n));
+    quranSetText('quranSurahArabic', s ? s.name : '');
+
+    /* deep link to this surah on quran.com (e.g. https://quran.com/33, label "quran.com/33") */
+    const qcom = document.getElementById('quranComLink');
+    if (qcom) qcom.href = 'https://quran.com/' + n;
+    quranSetText('quranComLinkText', 'quran.com/' + n);
+
+    /* prostration marker — shown only for surahs that contain an ayat as-sajdah */
+    const sajda = document.getElementById('quranSajdaBadge');
+    if (sajda) {
+        const has = (typeof quranSajdaSurahs !== 'undefined') && quranSajdaSurahs.has(n);
+        sajda.style.display = has ? 'inline-flex' : 'none';
+    }
+
+    /* gentle fade/scale-in of the title — only when the surah actually changes,
+       not on the first render (no animation when the tab loads) nor on the ~3s
+       progress refreshes that also call this */
+    if (n !== quranLastLabeledSurah) {
+        const firstRender = !quranTitleShown;
+        quranTitleShown = true;
+        quranLastLabeledSurah = n;
+        const disp = document.querySelector('#quranTab .quran-display');
+        if (disp && !firstRender) {
+            disp.classList.remove('quran-anim');
+            void disp.offsetWidth;   /* force reflow so the animation restarts */
+            disp.classList.add('quran-anim');
+        }
+    }
+}
+
+function quranUpdateCompleteBtn() {
+    const chk = document.getElementById('quranSurahCheck');   /* green check next to the surah name */
+    if (chk) chk.classList.toggle('done', quranCompletedSet.has(quranCurrentSurahNum));
+}
+
+/* paint the green fill of the custom seek track (value is 0–1000 → 0–100%) */
+function quranFillBar(range) {
+    if (range) range.style.setProperty('--quran-pct', ((range.value || 0) / 10) + '%');
+}
+
+function quranPaintProgress(cur, dur) {
+    const range = document.getElementById('quranProgress');
+    if (range && !quranScrubbing) {
+        range.value = (dur > 0) ? Math.round((cur / dur) * 1000) : 0;
+        quranFillBar(range);
+    }
+    const withHours = dur >= 3600;   /* surah over an hour → show both as h:mm:ss */
+    quranSetText('quranTimeCur', quranFmtTime(cur, withHours));
+    quranSetText('quranTimeDur', quranFmtTime(dur, withHours));
+}
+
+function quranTickOnce() {
+    if (quranScrubbing || !quranBase.playing) return;
+    let cur = quranBase.time + (Date.now() - quranBase.wall) / 1000;
+    if (quranBase.duration > 0 && cur > quranBase.duration) cur = quranBase.duration;
+    quranPaintProgress(cur, quranBase.duration);
+}
+function quranManageTicker(playing) {
+    if (playing && !quranTick) quranTick = setInterval(quranTickOnce, 500);
+    else if (!playing && quranTick) { clearInterval(quranTick); quranTick = null; }
+}
+
+/* green Qur'an play/pause toggle in the header (every tab): pause icon while playing, play icon otherwise.
+   Also greens the book menu icon's lines (#menu-div-quran) while audio plays. */
+function quranUpdateHeaderToggle(playing) {
+    const btn = document.getElementById('quranHeaderToggle');
+    if (btn) btn.classList.toggle('playing', !!playing);
+    const menu = document.getElementById('menu-div-quran');
+    if (menu) menu.classList.toggle('playing', !!playing);
+}
+
+/* Qur'an playback streams every surah from a CDN, so with no internet the feature can't
+   work: hide both entry points (the menu icon + the header play/pause toggle) while the
+   device is offline, and fall back to the clock tab if the Qur'an tab happens to be open
+   when the connection drops. Wired to the window online/offline events, so it reappears
+   automatically once connectivity returns. */
+function quranUpdateConnectivity() {
+    const online = navigator.onLine;
+    const menu = document.getElementById('menu-div-quran');
+    const toggle = document.getElementById('quranHeaderToggle');
+    if (menu) menu.classList.toggle('quran-offline-hidden', !online);
+    if (toggle) toggle.classList.toggle('quran-offline-hidden', !online);
+    if (!online && $('#quranTab').is(':visible')) $('#menu-div-clock').click();
+}
+
+/* ---- khatm progress bar (images/quran-progress.svg fetched once, segments flipped) ---- */
+function quranRenderKhatm() {
+    const host = document.getElementById('quranKhatmBar');
+    if (!host) return;
+    if (quranKhatmLoaded) { quranApplyKhatm(); return; }
+    fetch('images/quran-progress.svg').then(r => r.text()).then(txt => {
+        host.innerHTML = txt;
+        const svg = host.querySelector('svg');
+        if (svg) {                        /* crop to the bar; the 8px numbers are sub-pixel at popup width */
+            svg.setAttribute('viewBox', '0 111 1000 42');
+            svg.removeAttribute('width');
+            svg.removeAttribute('height');
+        }
+        quranKhatmLoaded = true;
+        quranApplyKhatm();
+    }).catch(() => { });
+}
+function quranApplyKhatm() {
+    const host = document.getElementById('quranKhatmBar');
+    if (host) {
+        for (let n = 1; n <= QURAN_SURAH_COUNT; n++) {
+            const g = host.querySelector('#surah-' + String(n).padStart(3, '0'));
+            if (g) {
+                const done = quranCompletedSet.has(n);
+                /* completion wins: a completed surah is green even when it's the one loaded now.
+                   Otherwise the currently-loaded surah is gold, the rest slate. Mutually exclusive
+                   so there's never a fill conflict; quranMarkCurrentSurah keeps this in sync as the
+                   loaded surah changes without a completion change. */
+                const current = !done && n === quranCurrentSurahNum;
+                g.classList.toggle('read', done);
+                g.classList.toggle('current', current);
+                g.classList.toggle('unread', !done && !current);
+            }
+        }
+    }
+    quranSetText('quranKhatmCount', quranCompletedSet.size + ' / ' + QURAN_SURAH_COUNT);
+    /* warm-gold celebration overlay — shown while the khatm is complete; the only way out is Restart.
+       Nested in #quranTab, so it hides with the tab and can't cover another one. */
+    const congrats = document.getElementById('quranCongrats');
+    if (congrats) {
+        congrats.style.display = (quranCompletedSet.size >= QURAN_SURAH_COUNT) ? 'flex' : 'none';
+    }
+}
+
+/* re-tint the khatm bar for the surah now loaded in the player, without recomputing every
+   segment: clear the old gold and gild the current one (unless it's already read → stays green).
+   The SVG's own `transition: fill .3s` fades the colour as the loaded surah changes. */
+function quranMarkCurrentSurah() {
+    const host = document.getElementById('quranKhatmBar');
+    if (!host) return;
+    host.querySelectorAll('.surah.current').forEach(g => {
+        g.classList.remove('current');
+        /* completion-aware in case the surah we're un-gilding was just auto-marked read */
+        const done = quranCompletedSet.has(parseInt(g.dataset.surah, 10));
+        g.classList.toggle('read', done);
+        g.classList.toggle('unread', !done);
+    });
+    if (!quranCompletedSet.has(quranCurrentSurahNum)) {
+        const g = host.querySelector('#surah-' + String(quranCurrentSurahNum).padStart(3, '0'));
+        if (g) { g.classList.remove('unread'); g.classList.add('current'); }
+    }
+}
+
+/* ---- render (tab open) + live refresh ---- */
+function renderQuranPlayer() {
+    if (!document.getElementById('quranTab')) return;
+    if (!quranBuilt) {
+        quranBuildPickers();
+        quranSetText('quranPickerTitle', quranT('reciter'));
+        quranSetText('quranSurahPickerTitle', quranT('surah'));
+        quranSetText('quranKhatmTitle', quranT('progress'));
+        quranSetText('quranCongratsText', quranT('congrats'));
+        quranSetText('quranKhatmReset', quranT('reset'));
+        const sajdaBadge = document.getElementById('quranSajdaBadge');
+        if (sajdaBadge) sajdaBadge.title = quranT('sajdaTip');
+        quranBuilt = true;
+    }
+    quranCloseReciterPicker();
+    quranCloseSurahPicker();
+    chrome.storage.local.get(['quranState', 'quranCompleted', 'appData'], (r) => {
+        quranCompletedSet = new Set(r.quranCompleted || []);
+        const sq = (r.appData && r.appData.settings && r.appData.settings.quran) || {};
+        quranSetReciterLabel(sq.reciter || QURAN_DEFAULT_RECITER);
+        quranRenderKhatm();
+        quranRefresh(r.quranState);
+    });
+}
+
+function quranRefresh(state) {
+    const proceed = (st) => {
+        st = st || { currentSurah: 1, currentTime: 0, duration: 0, isPlaying: false };
+        quranCurrentSurahNum = (st.currentSurah >= 1 && st.currentSurah <= QURAN_SURAH_COUNT) ? st.currentSurah : 1;
+        quranSetSurahLabel(quranCurrentSurahNum);
+        quranUpdateCompleteBtn();
+        quranMarkCurrentSurah();   /* gild the surah now loaded in the player (green if already read) */
+
+        const btn = document.getElementById('quranToggleBtn');
+        if (btn) {
+            btn.classList.toggle('playing', !!st.isPlaying);
+            btn.setAttribute('aria-label', st.isPlaying ? quranT('pause') : quranT('listen'));
+        }
+        quranUpdateHeaderToggle(!!st.isPlaying);
+
+        if (!quranScrubbing) {
+            quranBase = { time: st.currentTime || 0, wall: Date.now(), duration: st.duration || 0, playing: !!st.isPlaying };
+            quranPaintProgress(quranBase.time, quranBase.duration);
+        }
+        quranManageTicker(!!st.isPlaying);
+
+        const sp = document.getElementById('quranSurahPicker');
+        if (sp && sp.style.display === 'flex') quranUpdateSurahPickerMarks();
+    };
+    if (state) proceed(state);
+    else chrome.storage.local.get(['quranState'], (r) => proceed(r.quranState));
+}
+
+function quranSetReciter(identifier) {
+    quranSetReciterLabel(identifier);
+    chrome.storage.local.get(['appData'], (r) => {
+        appData = r.appData;
+        if (!appData.settings.quran) appData.settings.quran = {};
+        appData.settings.quran.reciter = identifier;
+        saveAppDataAndRefresh(appData);
+        quranSend({ quranReload: true });   /* if playing, reload the current spot with the new reciter */
+    });
+}
+
+/* manual mark/unmark from a surah-picker row */
+function quranToggleCompleted(surah) {
+    surah = surah || quranCurrentSurahNum;
+    const done = !quranCompletedSet.has(surah);
+    chrome.storage.local.get(['quranCompleted'], (r) => {
+        const set = new Set(r.quranCompleted || []);
+        if (done) set.add(surah); else set.delete(surah);
+        chrome.storage.local.set({ quranCompleted: Array.from(set).sort((a, b) => a - b) }, () => {
+            quranCompletedSet = set;
+            quranUpdateSurahPickerMarks();
+            quranUpdateCompleteBtn();
+            quranApplyKhatm();
+        });
+    });
+}
+
+/* Restart — start a fresh khatm: clear all completed surahs and reset playback to the very start
+   (surah 1 @ 0:00, stopped), as if opening the Qur'an tab for the first time. */
+function quranResetKhatm() {
+    chrome.storage.local.set({ quranCompleted: [] }, () => {
+        quranCompletedSet = new Set();
+        quranUpdateSurahPickerMarks();
+        quranUpdateCompleteBtn();
+        quranApplyKhatm();                  /* no longer complete → hides the celebration */
+        quranSend({ quranStop: true });     /* SW resets quranState to surah 1 / 0:00 / stopped */
+    });
+}
+
+/* current position (interpolated while playing), for the ±5s skip buttons */
+function quranCurrentPos() {
+    let cur = (quranBase.time || 0) + (quranBase.playing ? (Date.now() - quranBase.wall) / 1000 : 0);
+    if (quranBase.duration > 0) cur = Math.min(cur, quranBase.duration);
+    return Math.max(0, cur);
+}
+
+function quranSkip(delta) {
+    if (quranBase.duration <= 0) return;   /* wait until the surah's duration is known */
+    const target = Math.max(0, Math.min(quranBase.duration, quranCurrentPos() + delta));
+    quranSend({ quranSeek: target });
+}
+
+function quranOnScrub() {
+    quranScrubbing = true;
+    const range = document.getElementById('quranProgress');
+    quranFillBar(range);   /* keep the green fill under the thumb while dragging */
+    quranSetText('quranTimeCur', quranFmtTime(((range.value || 0) / 1000) * (quranBase.duration || 0), (quranBase.duration || 0) >= 3600));
+}
+function quranOnSeek() {
+    const range = document.getElementById('quranProgress');
+    const seconds = ((range.value || 0) / 1000) * (quranBase.duration || 0);
+    quranScrubbing = false;
+    if (quranBase.duration > 0) quranSend({ quranSeek: seconds });
+}
+
+/* live-update the bar when the SW / offscreen change playback or completion state */
+chrome.storage.onChanged.addListener(function (changes, area) {
+    if (area !== 'local') return;
+    if (changes.quranState) quranRefresh(changes.quranState.newValue);
+    if (changes.quranCompleted) {
+        quranCompletedSet = new Set(changes.quranCompleted.newValue || []);
+        quranUpdateSurahPickerMarks();
+        quranUpdateCompleteBtn();
+        quranApplyKhatm();
+    }
+});

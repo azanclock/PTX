@@ -1,6 +1,6 @@
 ﻿{
   "name": {
-    "message": "اوقات نماز به‌همراه هشدارها و تقویم هجری قمری",
+    "message": "اوقات نماز: قرآن، اذان، هشدارها و تقویم هجری قمری",
     "description": ""
   },
   "short_name": {
@@ -101,6 +101,10 @@
   },
   "adhansAndOffsetsTitle": {
     "message": "تنظیمات افست و اذان‌ها",
+    "description": ""
+  },
+  "audioVolumeTitle": {
+    "message": "بلندی صدای اذان و قرآن",
     "description": ""
   },
   "hijriDateOffsetTitle": {
