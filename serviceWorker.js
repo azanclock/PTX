@@ -13,9 +13,9 @@ self.addEventListener('message', async (msg) => {
     else if ('quranToggle' in msg.data) {
         await quranToggle();
     }
-    else if ('quranPlayFromSurah' in msg.data) {   /* jump to a surah from the dropdown */
+    else if ('quranSelectSurah' in msg.data) {     /* pick a surah from the list — cue it up, don't play */
         quranErrorStreak = 0;
-        await quranPlayAt(msg.data.quranPlayFromSurah, 0);
+        await quranSelectSurah(msg.data.quranSelectSurah);
     }
     else if ('quranNext' in msg.data) {
         quranErrorStreak = 0;
@@ -28,7 +28,7 @@ self.addEventListener('message', async (msg) => {
     else if ('quranSeek' in msg.data) {            /* drag the progress bar */
         await quranSeek(msg.data.quranSeek);
     }
-    else if ('quranReload' in msg.data) {          /* reciter changed → reload current spot */
+    else if ('quranReload' in msg.data) {          /* reciter changed → stop (new reciter loads on next play) */
         await quranReload();
     }
     else if ('quranStop' in msg.data) {
@@ -1263,7 +1263,19 @@ async function quranStep(delta) {
     const { state } = await quranGetContext();
     const next = (state.currentSurah || 1) + delta;
     if (next < 1 || next > QURAN_SURAH_COUNT) return;        /* clamp at the ends */
-    await quranPlayAt(next, 0);
+    await quranSelectSurah(next);
+}
+
+/* Load a surah into the player WITHOUT starting it: back / forward and picking from the surah
+   list all just cue the surah up (position 0, stopped) — the listener presses play to hear it.
+   Any audio currently playing is stopped so the shown surah and the sound never disagree.
+   (Natural end-of-surah auto-advance — quranAdvance — is unaffected and keeps playing on.) */
+async function quranSelectSurah(surah) {
+    surah = Math.round(surah);
+    if (surah < 1) surah = 1;
+    if (surah > QURAN_SURAH_COUNT) surah = QURAN_SURAH_COUNT;
+    await quranSetState({ currentSurah: surah, currentTime: 0, duration: 0, isPlaying: false });
+    chrome.runtime.sendMessage({ quranStopAudio: true }).catch(() => { });
 }
 
 async function quranSeek(seconds) {
@@ -1273,18 +1285,13 @@ async function quranSeek(seconds) {
     chrome.runtime.sendMessage({ quranSeek: state.currentTime }).catch(() => { });
 }
 
-async function quranReload() {   /* reciter changed → restart the current surah from the beginning */
+async function quranReload() {   /* reciter changed → stop; the new reciter loads on the next play */
     const { state } = await quranGetContext();
-    if (state.isPlaying) {
-        await quranPlayAt(state.currentSurah || 1, 0);
-    } else {
-        state.currentTime = 0;       /* reset saved spot so the next play starts fresh with the new reciter */
-        await quranSetState(state);
-    }
+    await quranSelectSurah(state.currentSurah || 1);   /* cue the current surah at 0:00, stopped */
 }
 
 async function quranAdvance() {
-    const { state } = await quranGetContext();
+    const { state, quran } = await quranGetContext();
     const finished = state.currentSurah || 1;
     quranDbg('SW quranAdvance finished=' + finished);
     const completedCount = await quranMarkCompleted(finished, true);   /* auto-mark on finish (visual only) */
@@ -1296,6 +1303,12 @@ async function quranAdvance() {
     if (finished >= QURAN_SURAH_COUNT) {                    /* played to surah 114 but some earlier surahs are still unread */
         await quranSetState({ currentSurah: finished, currentTime: 0, duration: 0, isPlaying: false });
         chrome.runtime.sendMessage({ quranStopAudio: true }).catch(() => { });
+        return;
+    }
+    /* Auto-continue toggle OFF: cue the next surah but leave it paused — the listener starts it.
+       (The finished surah was still auto-marked complete above, so the khatm keeps advancing.) */
+    if (quran.autoContinue === false) {
+        await quranSelectSurah(finished + 1);
         return;
     }
     /* Let the green check land before moving on (the onMessage handler returned true, so the

@@ -867,6 +867,7 @@ body {
 /* surah display — the top "card": surah number, Arabic + English name, completed toggle.
    Grouped in a subtle rounded panel so it reads as one distinct block (matches .quran-playback). */
 .quran-display {
+    position: relative;   /* anchor the flanking prev / next surah arrows */
     padding: 12px 14px;
     text-align: center;
     background: rgba(255, 255, 255, 0.03);
@@ -874,7 +875,60 @@ body {
     border-radius: 16px;
 }
 
-/* only the English surah name (+ its caret) opens the surah picker */
+/* previous / next surah — artistic gold chevrons flanking the surah display. Absolutely
+   positioned so the centred block (number, Arabic + English name, check) is untouched; they
+   read as page-turn arrows for the surah "card", dimmed at the first / last surah. */
+.quran-disp-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 60px;
+    padding: 0;
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.55));
+    transition: filter 0.18s ease, transform 0.18s ease, opacity 0.18s ease;
+}
+
+.quran-disp-prev { left: 1px; }
+.quran-disp-next { right: 1px; }
+
+.quran-disp-nav svg {
+    width: 33px;
+    height: 33px;
+    display: block;
+}
+
+.quran-disp-prev:hover {
+    transform: translateY(-50%) translateX(-2px);
+    filter: drop-shadow(0 2px 9px rgba(212, 175, 55, 0.6));
+}
+
+.quran-disp-next:hover {
+    transform: translateY(-50%) translateX(2px);
+    filter: drop-shadow(0 2px 9px rgba(212, 175, 55, 0.6));
+}
+
+.quran-disp-prev:active { transform: translateY(-50%) translateX(-2px) scale(0.88); }
+.quran-disp-next:active { transform: translateY(-50%) translateX(2px) scale(0.88); }
+
+/* at the first / last surah the matching arrow has nowhere to go */
+.quran-disp-nav:disabled {
+    opacity: 0.25;
+    cursor: default;
+    pointer-events: none;
+    filter: none;
+    transform: translateY(-50%);
+}
+
+/* the English surah name is the tappable link that opens the surah picker */
 .quran-name-link {
     background: transparent;
     border: 0;
@@ -882,7 +936,6 @@ body {
     padding: 0;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
     cursor: pointer;
 }
 
@@ -944,10 +997,10 @@ body {
     transform: rotate(45deg);   /* small diamond ornaments flanking the centre */
 }
 
-/* gentle fade/scale-in of the title block whenever the surah changes */
+/* gentle fade-in of the title block whenever the surah changes (fade only — no movement) */
 @keyframes quranTitleIn {
-    from { opacity: 0; transform: translateY(7px) scale(0.985); }
-    to   { opacity: 1; transform: none; }
+    from { opacity: 0; }
+    to   { opacity: 1; }
 }
 
 .quran-display.quran-anim {
@@ -959,24 +1012,12 @@ body {
 }
 
 .quran-surah-name-row {
+    padding: 0 24px;   /* keep long names clear of the flanking gold arrows */
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 6px;
     margin-top: 12px;
-}
-
-.quran-disp-caret {
-    width: 20px;
-    height: 20px;
-    color: #c2a86a;   /* gold, tied to the surah caption — clearly reads as a dropdown */
-    flex-shrink: 0;
-    transition: color 0.15s ease, transform 0.15s ease;
-}
-
-.quran-name-link:hover .quran-disp-caret {
-    color: #e7cf86;
-    transform: translateY(1px);   /* subtle "open" nudge on hover */
 }
 
 .quran-surah-name {
@@ -993,9 +1034,9 @@ body {
 
 .quran-surah-arabic {
     font-family: 'Amiri', 'Scheherazade New', 'Aref Ruqaa', 'Al Bayan', 'Geeza Pro', 'Noto Naskh Arabic', serif;
-    font-size: 30px;
+    font-size: 22px;
     line-height: 1.45;
-    margin: 16px auto 0;
+    margin: 8px auto 0;
     padding: 0 4px;
     width: fit-content;
     max-width: 100%;
@@ -1008,11 +1049,6 @@ body {
     -webkit-text-fill-color: transparent;
     color: #e7cf86;   /* fallback where background-clip:text is unsupported */
     filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.55));
-    transition: filter 0.15s ease;
-}
-
-.quran-surah-arabic:hover {
-    filter: drop-shadow(0 2px 7px rgba(212, 175, 55, 0.45));
 }
 
 /* reciter — a quiet pill (mic icon + name) that opens the reciter picker. Kept subdued so it
@@ -1026,10 +1062,10 @@ body {
     justify-content: center;
     gap: 5px;
     padding: 3px 11px 3px 9px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(194, 168, 106, 0.08);       /* soft gold pills, tied to the caption gold */
+    border: 1px solid rgba(194, 168, 106, 0.38);
     border-radius: 999px;
-    color: #adb5bd;
+    color: #c2a86a;
     cursor: pointer;
     transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
@@ -1037,7 +1073,7 @@ body {
 .quran-mic {
     width: 14px;
     height: 14px;
-    color: #8a9199;
+    color: #b89c60;   /* muted gold icon */
     flex-shrink: 0;
     transition: color 0.15s ease;
 }
@@ -1045,28 +1081,28 @@ body {
 .quran-reciter-name {
     font-size: 11px;
     font-weight: 500;
-    color: #adb5bd;
+    color: #cdb676;   /* soft gold label */
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
 .quran-reciter-btn:hover {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(255, 255, 255, 0.14);
+    background: rgba(194, 168, 106, 0.16);
+    border-color: rgba(194, 168, 106, 0.6);
 }
 
 .quran-reciter-btn:hover .quran-mic,
 .quran-reciter-btn:hover .quran-reciter-name {
-    color: #fff;
+    color: #ecd79a;   /* brighter gold on hover */
 }
 
-/* reciter + quran.com pills sit side by side at the bottom of the player card, below the
-   transport. The reciter pill may shrink (long names ellipsize); the quran.com link keeps its
-   full text. Spacing above comes from the .quran-playback column gap. */
+/* reciter + quran.com pills sit at the bottom of the surah card, centred as a pair. The reciter
+   pill may shrink (long names ellipsize); the quran.com link keeps its full text. */
 .quran-links-row {
     gap: 8px;
     min-width: 0;
+    margin-top: 14px;   /* below the completion line, at the foot of the surah card */
 }
 
 .quran-links-row .quran-reciter-btn {
@@ -1207,8 +1243,8 @@ body {
 
 .quran-toggle {
     flex-shrink: 0;
-    width: 64px;
-    height: 64px;
+    width: 48px;
+    height: 48px;
     padding: 0;
     margin: 0 2px;
     display: flex;
@@ -1228,8 +1264,8 @@ body {
 }
 
 .quran-toggle .qicon {
-    width: 32px;
-    height: 32px;
+    width: 24px;
+    height: 24px;
 }
 
 .quran-toggle .qpause,
@@ -1341,7 +1377,118 @@ body {
 /* the surah currently loaded in the player, in the tab's manuscript gold — a "you are here"
    on the khatm. Listed after .unread so it wins the fill; a completed surah is never .current
    (see quranApplyKhatm), so completion always stays green. */
-#quranKhatmBar .surah.current rect { fill: #d4af37; }
+#quranKhatmBar .surah.current rect { fill: #fbbf24; }
+
+/* auto-continue toggle — a compact on/off switch pinned to the bottom of the Qur'an tab. ON: when a
+   surah finishes the next one starts automatically (the long-standing behaviour). OFF: the next
+   surah is cued up but stays paused until the listener starts it. Matches the tab's grouped
+   cards (faint surface + hairline border) but rounded into a small pill. */
+.quran-footer {
+    display: flex;
+}
+
+.quran-auto-toggle {
+    flex: 1;                           /* full-width row, matching the cards above it */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;    /* label on the left, switch on the right */
+    gap: 9px;
+    padding: 11px 14px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    color: #8a9199;
+    font-size: 13px;
+    line-height: 1;
+    cursor: pointer;
+    transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.quran-auto-toggle:hover {
+    color: #aeb4bb;
+    border-color: rgba(255, 255, 255, 0.16);
+}
+
+.quran-auto-toggle:focus-visible {
+    outline: 2px solid rgba(34, 197, 94, 0.55);
+    outline-offset: 2px;
+}
+
+.quran-auto-label {
+    white-space: nowrap;
+}
+
+/* the switch itself: a small pill track with a sliding knob — muted grey when off, emerald when on */
+.quran-switch {
+    position: relative;
+    flex: 0 0 auto;
+    width: 30px;
+    height: 17px;
+    border-radius: 999px;
+    background: #3a424b;
+    transition: background 0.18s ease;
+}
+
+.quran-switch-knob {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    background: #cbd5e1;
+    transition: transform 0.18s ease, background 0.18s ease;
+}
+
+.quran-auto-toggle[aria-checked="true"] {
+    color: #cdd3da;
+}
+
+.quran-auto-toggle[aria-checked="true"] .quran-switch {
+    background: #22c55e;
+}
+
+.quran-auto-toggle[aria-checked="true"] .quran-switch-knob {
+    transform: translateX(13px);
+    background: #ffffff;
+}
+
+/* settings on/off switch — replaces the old images/on.png & images/off.png toggle icons used
+   across the times/settings tab (adhan calls, desktop notifications, hanafi asr, imsak, duha,
+   midnight, 24h). A single pill element whose ON/OFF state is set by toggling the .on class from
+   JS. Colours match the retired PNGs exactly: grey #575d63 off, blue #1383fb on, white knob;
+   33x19 keeps the footprint identical to the images it replaces. */
+.px-switch {
+    position: relative;
+    display: inline-block;
+    flex: 0 0 auto;
+    width: 33px;
+    height: 19px;
+    border-radius: 999px;
+    background: #575d63;
+    vertical-align: middle;
+    transition: background 0.18s ease;
+}
+
+.px-switch::after {
+    content: "";
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: #ffffff;
+    transition: transform 0.18s ease;
+}
+
+.px-switch.on {
+    background: #1383fb;
+}
+
+.px-switch.on::after {
+    transform: translateX(14px);
+}
 
 /* khatm completion — a warm-gold celebration in the manuscript style, shown when all 114 surahs
    are complete (replaces the old inline green banner). Nested inside #quranTab so it hides with the
@@ -1511,15 +1658,14 @@ body {
     min-height: 0;
 }
 
-/* reciter picker rows */
+/* reciter picker rows (tap row = pick reciter; tap heart = favourite) */
 .quran-picker-item {
     display: flex;
-    flex-direction: column;
-    align-items: flex-start;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
     width: 100%;
     text-align: left;
-    background: transparent;
-    border: 0;
     border-bottom: 1px solid #2b3138;
     color: #e9ecef;
     padding: 8px 6px;
@@ -1534,6 +1680,15 @@ body {
     background: #14532d;
 }
 
+/* name + Arabic name stacked; takes the row's free width so the heart sits flush at the end */
+.quran-picker-item-text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
 .quran-picker-item-name {
     font-size: 14px;
     font-weight: 600;
@@ -1543,6 +1698,64 @@ body {
     font-size: 12px;
     color: #adb5bd;
     direction: rtl;
+}
+
+/* heart toggle at the end of a reciter row: muted outline, filled gold when favourited */
+.quran-reciter-fav {
+    flex-shrink: 0;
+    position: relative;   /* anchor the enlarged (invisible) tap target below */
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    background: transparent;
+    border: 0;
+    color: #8a9199;
+    cursor: pointer;
+    transition: color 0.15s ease, transform 0.05s ease;
+}
+
+/* Forgiving tap target past the 30px box (mirrors .quran-srow-check) so a near-miss still hearts
+   the reciter instead of selecting it — the button's handler stops propagation. Invisible. */
+.quran-reciter-fav::before {
+    content: "";
+    position: absolute;
+    top: -6px;
+    bottom: -6px;
+    left: -8px;      /* covers the gap back toward the name */
+    right: -6px;
+}
+
+.quran-reciter-fav svg {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.quran-reciter-fav:hover {
+    color: #c9ced3;
+}
+
+.quran-reciter-fav:active {
+    transform: scale(0.88);
+}
+
+.quran-reciter-fav.faved {
+    color: #e0b64d;   /* warm gold */
+}
+
+.quran-reciter-fav.faved svg {
+    fill: currentColor;
+}
+
+.quran-reciter-fav.faved:hover {
+    color: #ecc667;
 }
 
 /* surah picker rows (tap row = jump; tap check = toggle complete) */
@@ -1596,6 +1809,7 @@ body {
 
 .quran-srow-check {
     flex-shrink: 0;
+    position: relative;   /* anchor the enlarged (invisible) tap target below */
     width: 24px;
     height: 24px;
     border-radius: 50%;
@@ -1607,6 +1821,18 @@ body {
     justify-content: center;
     padding: 0;
     cursor: pointer;
+}
+
+/* Forgiving tap target: extend the clickable area well past the 24px circle — into the row's
+   padding and the gap before it — so a near-miss still checks the surah off (the button's handler
+   stops propagation) instead of falling through to the row's select. Invisible; circle unchanged. */
+.quran-srow-check::before {
+    content: "";
+    position: absolute;
+    top: -8px;
+    bottom: -8px;
+    left: -11px;     /* covers the whole gap back to the Arabic name (main undershoot direction) */
+    right: -12px;
 }
 
 .quran-srow-check svg {

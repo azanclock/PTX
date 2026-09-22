@@ -177,8 +177,7 @@
 
                     <div class="d-flex flex-row justify-content-between gap-1 mt-2">
                         <div class="adhansToggle bg-darkish rounded px-2 py-1 pointerOn flex-fill">
-                            <img src="images/on.png" class="adhan-on" style="display:none;" />
-                            <img src="images/off.png" class="adhan-off" style="display:none;" />
+                            <span class="px-switch" id="adhanEnabledSwitch"></span>
                             <span class="badge px-1" id="enableAdhanCallsTitle"></span>
                             <img class="adhan-on" src="images/audio-on.png" style="height:19px; display: none;" />
                             <img class="adhan-off" src="images/audio-off.png" style="height:19px; display:none;" />
@@ -190,26 +189,22 @@
                     </div>
 
                     <div id="desktopNotificationsToggle" class="bg-darkish rounded px-2 py-1 mt-1 pointerOn flex-fill">
-                        <img src="images/on.png" id="desktopNotificationsOn" style="display:none;" />
-                        <img src="images/off.png" id="desktopNotificationsOff" style="display:none;" />
+                        <span class="px-switch" id="desktopNotificationsSwitch"></span>
                         <span class="badge px-1" id="desktopNotificationsTitle"></span>
                     </div>
 
                     <div id="hanafiAsrToggle" class="bg-darkish rounded px-2 py-1 mt-1 pointerOn">
-                        <img src="images/on.png" class="hanafiAsrOption" id="hanafiAsrOn" style="display:none;" />
-                        <img src="images/off.png" class="hanafiAsrOption" id="hanafiAsrOff" style="display:none;" />
+                        <span class="px-switch" id="hanafiAsrSwitch"></span>
                         <span class="badge px-1" id="hanafiAsrTitle"></span>
                     </div>
 
                     <div class="d-flex flex-row justify-content-between gap-1 mt-1">
                         <div id="showImsakToggle" class="bg-darkish rounded px-2 py-1 pointerOn flex-fill">
-                            <img src="images/on.png" class="showImsakOption" id="showImsakOn" style="display:none;" />
-                            <img src="images/off.png" class="showImsakOption" id="showImsakOff" style="display:none;" />
+                            <span class="px-switch" id="showImsakSwitch"></span>
                             <span class="badge px-1" id="showImsakTitle"></span>
                         </div>
                         <div id="showDuhaToggle" class="bg-darkish rounded px-2 py-1 pointerOn flex-fill">
-                            <img src="images/on.png" class="showDuhaOption" id="showDuhaOn" style="display:none;" />
-                            <img src="images/off.png" class="showDuhaOption" id="showDuhaOff" style="display:none;" />
+                            <span class="px-switch" id="showDuhaSwitch"></span>
                             <span class="badge px-1 duhaText"></span>
                         </div>
 
@@ -217,15 +212,11 @@
 
                     <div class="d-flex flex-row justify-content-between gap-1 mt-1">
                         <div id="showMidnightToggle" class="bg-darkish rounded px-2 py-1 pointerOn flex-fill">
-                            <img src="images/on.png" class="showMidnightOption" id="showMidnightOn"
-                                style="display:none;" />
-                            <img src="images/off.png" class="showMidnightOption" id="showMidnightOff"
-                                style="display:none;" />
+                            <span class="px-switch" id="showMidnightSwitch"></span>
                             <span class="badge px-1" id="showMidnightTitle"></span>
                         </div>
                         <div id="hour24Toggle" class="bg-darkish rounded px-2 py-1 pointerOn flex-fill">
-                            <img src="images/on.png" class="hour24Option" id="hour24On" style="display:none;" />
-                            <img src="images/off.png" class="hour24Option" id="hour24Off" style="display:none;" />
+                            <span class="px-switch" id="hour24Switch"></span>
                             <span class="badge px-1" id="hour24Title"></span>
                         </div>
                     </div>
@@ -404,6 +395,8 @@
                         <div class="quran-controls d-flex flex-column flex-grow-1 justify-content-center">
 
                             <div class="quran-display">
+                                <button id="quranDispPrevBtn" type="button" class="quran-disp-nav quran-disp-prev" aria-label="Previous surah" title="Previous surah"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="quranArrowGoldL" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fdeeb8"/><stop offset="0.55" stop-color="#e7cf86"/><stop offset="1" stop-color="#d4af37"/></linearGradient></defs><path d="M16 3 6.9 11.3Q6.2 12 6.9 12.7L16 21 11.6 12Z" fill="url(#quranArrowGoldL)"/></svg></button>
+                                <button id="quranDispNextBtn" type="button" class="quran-disp-nav quran-disp-next" aria-label="Next surah" title="Next surah"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="quranArrowGoldR" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fdeeb8"/><stop offset="0.55" stop-color="#e7cf86"/><stop offset="1" stop-color="#d4af37"/></linearGradient></defs><path d="M8 3 17.1 11.3Q17.8 12 17.1 12.7L8 21 12.4 12Z" fill="url(#quranArrowGoldR)"/></svg></button>
                                 <div id="quranSurahCaption" class="quran-surah-caption">
                                     <span id="quranSurahNumber" class="quran-surah-number"></span>
                                 </div>
@@ -412,10 +405,6 @@
                                     <button id="quranSurahBtn" type="button" class="quran-name-link"
                                         aria-label="Change surah">
                                         <span id="quranSurahName" class="quran-surah-name"></span>
-                                        <svg class="quran-disp-caret" xmlns="http://www.w3.org/2000/svg"
-                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-                                            stroke-linecap="round" stroke-linejoin="round"><path
-                                                d="m6 9 6 6 6-6" /></svg>
                                     </button>
                                     <span id="quranSajdaBadge" class="quran-sajda-badge" style="display:none;"
                                         aria-hidden="true"><span class="quran-sajda-mark">۩</span></span>
@@ -428,6 +417,25 @@
                                                 stroke-linecap="round" stroke-linejoin="round"><path
                                                     d="M20 6 9 17l-5-5" /></svg></span>
                                     </span>
+                                </div>
+                                <div class="quran-links-row d-flex flex-row align-items-center justify-content-center">
+                                    <button id="quranReciterBtn" type="button" class="quran-reciter-btn" aria-label="Reciter"
+                                        title="Reciter">
+                                        <svg class="quran-mic" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                            stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3" /><path
+                                                d="M5 10a7 7 0 0 0 14 0" /><line x1="12" y1="19" x2="12" y2="22" /></svg>
+                                        <span id="quranReciterName" class="quran-reciter-name">—</span>
+                                    </button>
+                                    <a id="quranComLink" class="quran-reciter-btn quran-com-link" target="_blank"
+                                        rel="noopener" aria-label="Open this surah on quran.com" title="Open on quran.com"
+                                        href="https://quran.com/1">
+                                        <svg class="quran-mic" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                            stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" /><path
+                                                d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" /></svg>
+                                        <span id="quranComLinkText" class="quran-reciter-name">quran.com</span>
+                                    </a>
                                 </div>
                             </div>
 
@@ -470,26 +478,6 @@
                                                 stroke="none" fill="currentColor" text-anchor="middle"
                                                 font-family="sans-serif">10</text></svg></button>
                                 </div>
-
-                                <div class="quran-links-row d-flex flex-row align-items-center justify-content-center">
-                                    <button id="quranReciterBtn" type="button" class="quran-reciter-btn" aria-label="Reciter"
-                                        title="Reciter">
-                                        <svg class="quran-mic" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-                                            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                            stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3" /><path
-                                                d="M5 10a7 7 0 0 0 14 0" /><line x1="12" y1="19" x2="12" y2="22" /></svg>
-                                        <span id="quranReciterName" class="quran-reciter-name">—</span>
-                                    </button>
-                                    <a id="quranComLink" class="quran-reciter-btn quran-com-link" target="_blank"
-                                        rel="noopener" aria-label="Open this surah on quran.com" title="Open on quran.com"
-                                        href="https://quran.com/1">
-                                        <svg class="quran-mic" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-                                            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                            stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" /><path
-                                                d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" /></svg>
-                                        <span id="quranComLinkText" class="quran-reciter-name">quran.com</span>
-                                    </a>
-                                </div>
                             </div>
 
                             <div class="quran-khatm">
@@ -498,6 +486,13 @@
                                     <span id="quranKhatmCount">0 / 114</span>
                                 </div>
                                 <div id="quranKhatmBar" class="quran-khatm-bar"></div>
+                            </div>
+
+                            <div class="quran-footer">
+                                <button id="quranAutoContinueToggle" type="button" class="quran-auto-toggle" role="switch" aria-checked="true">
+                                    <span id="quranAutoContinueLabel" class="quran-auto-label">Auto-continue next surah</span>
+                                    <span class="quran-switch" aria-hidden="true"><span class="quran-switch-knob"></span></span>
+                                </button>
                             </div>
                         </div>
 

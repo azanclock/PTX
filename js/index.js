@@ -220,11 +220,14 @@ $(function () {
     $('#quranToggleBtn').click(() => quranSend({ quranToggle: true }));
     $('#quranPrevBtn').click(() => quranSend({ quranPrev: true }));
     $('#quranNextBtn').click(() => quranSend({ quranNext: true }));
+    $('#quranDispPrevBtn').click(() => quranSend({ quranPrev: true }));   /* gold arrows flanking the surah display */
+    $('#quranDispNextBtn').click(() => quranSend({ quranNext: true }));
     $('#quranBack10Btn').click(() => quranSkip(-10));
     $('#quranFwd10Btn').click(() => quranSkip(10));
     $('#quranProgress').on('input', quranOnScrub).on('change', quranOnSeek);
     $('#quranSurahCheck').click(function (e) { e.stopPropagation(); quranToggleCompleted(); });
     $('#quranKhatmReset').click(quranResetKhatm);
+    $('#quranAutoContinueToggle').click(quranToggleAutoContinue);
 
     /* header play/pause toggle (visible on every tab) */
     $('#quranHeaderToggle').click(() => quranSend({ quranToggle: true }));
@@ -240,6 +243,10 @@ $(function () {
     $('#quranPickerClose').click(quranCloseReciterPicker);
     $('#quranSurahPickerClose').click(quranCloseSurahPicker);
 
+    $('#quranReciterList').on('click', '.quran-reciter-fav', function (e) {
+        e.stopPropagation();                                   /* heart only — don't also pick the reciter */
+        quranToggleFavorite(this);
+    });
     $('#quranReciterList').on('click', '.quran-picker-item', function () {
         quranSetReciter(this.dataset.id);
         quranCloseReciterPicker();
@@ -249,7 +256,7 @@ $(function () {
         quranToggleCompleted(parseInt(this.dataset.surah, 10));
     });
     $('#quranSurahList').on('click', '.quran-srow', function () {
-        quranSend({ quranPlayFromSurah: parseInt(this.dataset.surah, 10) });
+        quranSend({ quranSelectSurah: parseInt(this.dataset.surah, 10) });
         quranCloseSurahPicker();
     });
 
@@ -599,51 +606,17 @@ const setFields = async () => {
     $('.iconButton').removeClass('btn-primary').addClass('btn-darkish');
     $('#' + appData.settings.iconStyle.toLowerCase() + 'Button').removeClass('btn-darkish').addClass("btn-primary");
 
-    $('#desktopNotificationsOn').hide();
-    $('#desktopNotificationsOff').hide();
-    if (appData.settings.desktopNotifications)
-        $('#desktopNotificationsOn').show();
-    else
-        $('#desktopNotificationsOff').show();
+    $('#desktopNotificationsSwitch').toggleClass('on', !!appData.settings.desktopNotifications);
 
-    $('.hanafiAsrOption').hide();
-    if (appData.settings.hanafiAsr)
-        $('#hanafiAsrOn').show();
-    else
-        $('#hanafiAsrOff').show();
+    $('#hanafiAsrSwitch').toggleClass('on', !!appData.settings.hanafiAsr);
 
-    $('.showImsakOption').hide();
-    if (appData.settings.showImsak) {
-        $('#showImsakOn').show();
-    }
-    else {
-        $('#showImsakOff').show();
-    }
+    $('#showImsakSwitch').toggleClass('on', !!appData.settings.showImsak);
 
-    $('.showDuhaOption').hide();
-    if (appData.settings.showDuha) {
-        $('#showDuhaOn').show();
-    }
-    else {
-        $('#showDuhaOff').show();
-    }
+    $('#showDuhaSwitch').toggleClass('on', !!appData.settings.showDuha);
 
-    $('.showMidnightOption').hide();
-    if (appData.settings.showMidnight) {
-        $('#showMidnightOn').show();
-    }
-    else {
-        $('#showMidnightOff').show();
+    $('#showMidnightSwitch').toggleClass('on', !!appData.settings.showMidnight);
 
-    }
-
-    $('.hour24Option').hide();
-    if (appData.settings.timeFormat == 12) {
-        $('#hour24Off').show();
-    }
-    else {
-        $('#hour24On').show();
-    }
+    $('#hour24Switch').toggleClass('on', appData.settings.timeFormat != 12);
 
     $('.lastHourHilite').hide();
     if (appData.settings.isLastHour) {
@@ -716,6 +689,7 @@ const displayAdhansAndOffsets = () => {
         $('.adhan-on').show();
     else
         $('.adhan-off').show();
+    $('#adhanEnabledSwitch').toggleClass('on', !!appData.settings.areAdhansEnabled);
 
     adhanVakits.forEach((v) => {
         let thisTime = appData.allVakits.find(f => f.name.toLowerCase() == v);
@@ -1445,6 +1419,7 @@ let quranBuilt = false;
 let quranKhatmLoaded = false;
 let quranCurrentSurahNum = 1;
 let quranCurrentReciter = QURAN_DEFAULT_RECITER;
+let quranFavReciters = new Set();   /* identifiers the user has hearted; sorted to the top of the picker */
 let quranCompletedSet = new Set();
 let quranScrubbing = false;
 let quranTick = null;
@@ -1453,14 +1428,43 @@ let quranLastLabeledSurah = 0;   /* so the title fade-in fires only on an actual
 let quranTitleShown = false;     /* skip the fade on the first render (no animation when the tab loads) */
 
 /* ---- pickers (surah + reciter), full-card overlays ---- */
-function quranBuildPickers() {
+
+/* Reciters with the favourited ones first (each group keeps the source list's order), so
+   hearted reciters float to the top of the picker. */
+function quranSortedReciters() {
     const reciters = (typeof quranReciters !== 'undefined') ? quranReciters : [];
+    const fav = [], rest = [];
+    reciters.forEach(r => (quranFavReciters.has(r.identifier) ? fav : rest).push(r));
+    return fav.concat(rest);
+}
+
+/* Heart outline (Feather/Lucide); CSS fills it gold for .faved rows. */
+const QURAN_HEART_SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true">'
+    + '<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23'
+    + 'l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>';
+
+/* (Re)paint the reciter list, favourites on top. Called once on build and again each time the
+   picker opens, so a heart toggled while it's open takes its new spot on the next open. */
+function quranRenderReciterList() {
     const rbox = document.getElementById('quranReciterList');
-    if (rbox) rbox.innerHTML = reciters.map(r =>
-        '<button type="button" class="quran-picker-item" data-id="' + calEsc(r.identifier) + '">'
-        + '<span class="quran-picker-item-name">' + calEsc(r.englishName) + '</span>'
-        + '<span class="quran-picker-item-ar">' + calEsc(r.name) + '</span>'
-        + '</button>').join('');
+    if (!rbox) return;
+    const favLabel = calEsc(quranT('favorite'));
+    rbox.innerHTML = quranSortedReciters().map(r => {
+        const faved = quranFavReciters.has(r.identifier);
+        return '<div class="quran-picker-item" data-id="' + calEsc(r.identifier) + '">'
+            + '<span class="quran-picker-item-text">'
+            + '<span class="quran-picker-item-name">' + calEsc(r.englishName) + '</span>'
+            + '<span class="quran-picker-item-ar">' + calEsc(r.name) + '</span>'
+            + '</span>'
+            + '<button type="button" class="quran-reciter-fav' + (faved ? ' faved' : '') + '" data-id="'
+            + calEsc(r.identifier) + '" aria-label="' + favLabel + '" title="' + favLabel + '" aria-pressed="'
+            + (faved ? 'true' : 'false') + '">' + QURAN_HEART_SVG + '</button>'
+            + '</div>';
+    }).join('');
+}
+
+function quranBuildPickers() {
+    quranRenderReciterList();
 
     const surahs = (typeof quranSurahs !== 'undefined') ? quranSurahs : [];
     const check = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"'
@@ -1494,6 +1498,7 @@ function quranUpdateSurahPickerMarks() {
 }
 
 function quranOpenReciterPicker() {
+    quranRenderReciterList();   /* re-sort so any newly hearted reciters are now on top */
     const box = document.getElementById('quranReciterList');
     if (box) {
         box.querySelectorAll('.quran-picker-item').forEach(el =>
@@ -1538,6 +1543,12 @@ function quranSetSurahLabel(n) {
     if (cap) cap.setAttribute('aria-label', quranT('surah') + ' ' + n);   /* keep the spoken label */
     quranSetText('quranSurahName', s ? s.englishName : ('Surah ' + n));
     quranSetText('quranSurahArabic', s ? s.name : '');
+
+    /* the flanking gold arrows have nowhere to go at the first / last surah */
+    const dPrev = document.getElementById('quranDispPrevBtn');
+    const dNext = document.getElementById('quranDispNextBtn');
+    if (dPrev) dPrev.disabled = (n <= 1);
+    if (dNext) dNext.disabled = (n >= QURAN_SURAH_COUNT);
 
     /* deep link to this surah on quran.com (e.g. https://quran.com/33, label "quran.com/33") */
     const qcom = document.getElementById('quranComLink');
@@ -1695,6 +1706,7 @@ function renderQuranPlayer() {
         quranSetText('quranKhatmTitle', quranT('progress'));
         quranSetText('quranCongratsText', quranT('congrats'));
         quranSetText('quranKhatmReset', quranT('reset'));
+        quranSetText('quranAutoContinueLabel', quranT('autoContinue'));
         const sajdaBadge = document.getElementById('quranSajdaBadge');
         if (sajdaBadge) sajdaBadge.title = quranT('sajdaTip');
         quranBuilt = true;
@@ -1704,7 +1716,9 @@ function renderQuranPlayer() {
     chrome.storage.local.get(['quranState', 'quranCompleted', 'appData'], (r) => {
         quranCompletedSet = new Set(r.quranCompleted || []);
         const sq = (r.appData && r.appData.settings && r.appData.settings.quran) || {};
+        quranFavReciters = new Set(Array.isArray(sq.favoriteReciters) ? sq.favoriteReciters : []);
         quranSetReciterLabel(sq.reciter || QURAN_DEFAULT_RECITER);
+        quranSetAutoContinue(sq.autoContinue !== false);   /* default ON when unset */
         quranRenderKhatm();
         quranRefresh(r.quranState);
     });
@@ -1745,7 +1759,46 @@ function quranSetReciter(identifier) {
         if (!appData.settings.quran) appData.settings.quran = {};
         appData.settings.quran.reciter = identifier;
         saveAppDataAndRefresh(appData);
-        quranSend({ quranReload: true });   /* if playing, reload the current spot with the new reciter */
+        quranSend({ quranReload: true });   /* changing reciter stops playback; new reciter loads on next play */
+    });
+}
+
+/* auto-continue toggle (bottom of the tab): ON = the next surah starts automatically when the current
+   one finishes; OFF = the next surah is cued up but stays paused until the listener starts it.
+   Default ON — the long-standing behaviour. The service worker reads appData.settings.quran
+   .autoContinue in quranAdvance; here we only flip the setting and repaint the switch. */
+function quranSetAutoContinue(on) {
+    const btn = document.getElementById('quranAutoContinueToggle');
+    if (btn) btn.setAttribute('aria-checked', on ? 'true' : 'false');
+}
+
+function quranToggleAutoContinue() {
+    chrome.storage.local.get(['appData'], (r) => {
+        appData = r.appData;
+        if (!appData.settings.quran) appData.settings.quran = {};
+        const on = appData.settings.quran.autoContinue === false;   /* flip: OFF→ON, else ON→OFF */
+        appData.settings.quran.autoContinue = on;
+        quranSetAutoContinue(on);
+        saveAppDataAndRefresh(appData);
+    });
+}
+
+/* heart / un-heart a reciter (btn = the tapped heart). Persists to
+   appData.settings.quran.favoriteReciters and flips the heart in place; the row keeps its spot
+   until the picker is next opened (see quranRenderReciterList), so tapping never yanks the row
+   out from under the finger. */
+function quranToggleFavorite(btn) {
+    const identifier = btn && btn.dataset.id;
+    if (!identifier) return;
+    const on = !quranFavReciters.has(identifier);
+    if (on) quranFavReciters.add(identifier); else quranFavReciters.delete(identifier);
+    btn.classList.toggle('faved', on);                       /* immediate feedback, no re-sort while open */
+    btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    chrome.storage.local.get(['appData'], (r) => {
+        appData = r.appData;
+        if (!appData.settings.quran) appData.settings.quran = {};
+        appData.settings.quran.favoriteReciters = Array.from(quranFavReciters);
+        saveAppDataAndRefresh(appData);
     });
 }
 
