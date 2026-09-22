@@ -306,64 +306,73 @@
 
                 <div id="alarmsSettings" class="tabDiv text-start h-100 pt-2 pb-2" style="display:none;">
 
-                    <div class="d-flex flex-column h-100" style="overflow:hidden;">
+                    <!-- List view: alarm count header + Add button, shown first -->
+                    <div id="alarmListView" class="d-flex flex-column h-100" style="overflow:hidden;">
 
-                    <div class="flex-shrink-0">
-
-                    <ul class="nav nav-pills nav-justified" id="alarms-tab" role="tablist">
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link active btn-sm py-1" id="add-alarm-tab"
-                                data-bs-toggle="pill" data-bs-target="#add-alarm-pane" type="button" role="tab">+
-                                <span class="alarmTabText">Alarm</span></button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link btn-sm py-1" id="add-nafl-tab"
-                                data-bs-toggle="pill" data-bs-target="#add-nafl-pane" type="button" role="tab">+
-                                <span class="naflTabText">Nafl Alarm</span></button>
-                        </li>
-                    </ul>
-
-                    <div class="tab-content py-2 px-2 mb-3" id="alarms-tabContent">
-
-                        <div class="tab-pane fade show active" id="add-alarm-pane" role="tabpanel">
-                            <select id="alarmSound" class="form-control form-control-sm mb-2"></select>
-                            <select id="alarmFrequency" class="form-control form-control-sm mb-2">
-                                <option value="W" class="weekdaysText">Weekdays</option>
-                                <option value="E" class="everydayText">Everyday</option>
-                            </select>
-                            <div class="d-flex flex-row align-items-center gap-1">
-                                <span class="small" style="padding-inline-end:5px;">at</span>
-                                <select id="alarmHour" class="form-control form-control-sm p-1"></select>
-                                <span class="small">:</span>
-                                <select id="alarmMinute" class="form-control form-control-sm p-1"></select>
-                                <select id="alarmAp" class="form-control form-control-sm p-1">
-                                    <option value="am">am</option>
-                                    <option value="pm">pm</option>
-                                </select>
-                                <button id="addAlarmButton" type="button"
-                                    class="btn btn-sm btn-warning px-3 ms-auto">+</button>
-                            </div>
+                        <div class="flex-shrink-0 d-flex align-items-center justify-content-between mb-2">
+                            <div class="alarms-header-title"><span class="alarmsHeaderText">Alarms</span> <span id="alarmsCount">(0)</span></div>
+                            <button id="showAlarmFormBtn" type="button" class="alarm-add-btn"><span class="alarm-add-plus">+</span> <span class="addAlarmText">Add</span></button>
                         </div>
 
-                        <div class="tab-pane fade" id="add-nafl-pane" role="tabpanel">
-                            <select id="naflSound" class="form-control form-control-sm mb-2"></select>
-                            <select id="naflVakit" class="form-control form-control-sm mb-2"></select>
-                            <div class="d-flex flex-row align-items-center gap-1">
-                                <select id="naflMinutes" class="form-control form-control-sm p-1"></select>
-                                <select id="naflWhen" class="form-control form-control-sm p-1">
-                                    <option value="before" class="beforeText">before</option>
-                                    <option value="after" class="afterText">after</option>
-                                </select>
-                                <button id="addNaflButton" type="button"
-                                    class="btn btn-sm btn-success px-3 ms-auto">+</button>
-                            </div>
-                        </div>
+                        <div id="alarmsList" class="flex-grow-1 csb pe-1" style="overflow-y:auto; min-height:0;"></div>
 
                     </div>
 
-                    </div>
+                    <!-- Form view: hidden until the user taps Add -->
+                    <div id="alarmFormView" class="alarm-hidden">
 
-                    <div id="alarmsList" class="flex-grow-1 csb pe-1" style="overflow-y:auto; min-height:0;"></div>
+                        <div class="alarm-form-head">
+                            <button id="alarmFormBackBtn" type="button" class="alarm-back-btn" aria-label="Back"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+
+                            <ul class="nav nav-pills nav-justified" id="alarms-tab" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link active btn-sm py-1" id="add-alarm-tab"
+                                        data-bs-toggle="pill" data-bs-target="#add-alarm-pane" type="button" role="tab"><span class="alarmTabText">Alarm</span></button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link btn-sm py-1" id="add-nafl-tab"
+                                        data-bs-toggle="pill" data-bs-target="#add-nafl-pane" type="button" role="tab"><span class="naflTabText">Nafl Alarm</span></button>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="tab-content py-2 px-2" id="alarms-tabContent">
+
+                            <div class="tab-pane fade show active" id="add-alarm-pane" role="tabpanel">
+                                <select id="alarmSound" class="form-control form-control-sm mb-2"></select>
+                                <select id="alarmFrequency" class="form-control form-control-sm mb-2">
+                                    <option value="W" class="weekdaysText">Weekdays</option>
+                                    <option value="E" class="everydayText">Everyday</option>
+                                </select>
+                                <div class="d-flex flex-row align-items-center gap-1">
+                                    <span class="small" style="padding-inline-end:5px;">at</span>
+                                    <select id="alarmHour" class="form-control form-control-sm p-1"></select>
+                                    <span class="small">:</span>
+                                    <select id="alarmMinute" class="form-control form-control-sm p-1"></select>
+                                    <select id="alarmAp" class="form-control form-control-sm p-1">
+                                        <option value="am">am</option>
+                                        <option value="pm">pm</option>
+                                    </select>
+                                    <button id="addAlarmButton" type="button"
+                                        class="btn btn-sm btn-warning px-3 ms-auto">+</button>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane fade" id="add-nafl-pane" role="tabpanel">
+                                <select id="naflSound" class="form-control form-control-sm mb-2"></select>
+                                <select id="naflVakit" class="form-control form-control-sm mb-2"></select>
+                                <div class="d-flex flex-row align-items-center gap-1">
+                                    <select id="naflMinutes" class="form-control form-control-sm p-1"></select>
+                                    <select id="naflWhen" class="form-control form-control-sm p-1">
+                                        <option value="before" class="beforeText">before</option>
+                                        <option value="after" class="afterText">after</option>
+                                    </select>
+                                    <button id="addNaflButton" type="button"
+                                        class="btn btn-sm btn-success px-3 ms-auto">+</button>
+                                </div>
+                            </div>
+
+                        </div>
 
                     </div>
 

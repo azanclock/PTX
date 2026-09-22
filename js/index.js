@@ -193,6 +193,7 @@ $(function () {
         $('.tabDiv').hide();
         $('#alarmsSettings').show();
         $('#footer').hide();
+        showAlarmList();
         displayAlarms();
     });
 
@@ -455,6 +456,8 @@ $(function () {
         stopAudio();
     });
 
+    $("#showAlarmFormBtn").click(showAlarmForm);
+    $("#alarmFormBackBtn").click(showAlarmList);
     $("#addAlarmButton").click(addAlarm);
     $("#addNaflButton").click(addNaflAlarm);
     $("#alarmsList").on('click', '.removeAlarmBtn', function () {
@@ -930,6 +933,18 @@ const displayAlarms = () => {
     renderAlarmsList();
 };
 
+/* The alarm page opens on the list (count + Add button); the form only appears
+   after the user taps Add, and any add/remove returns them to the list. */
+const showAlarmForm = () => {
+    $('#alarmListView').addClass('alarm-hidden');
+    $('#alarmFormView').removeClass('alarm-hidden');
+};
+
+const showAlarmList = () => {
+    $('#alarmFormView').addClass('alarm-hidden');
+    $('#alarmListView').removeClass('alarm-hidden');
+};
+
 const initAlarmControls = () => {
     if ($('#alarmHour option').length === 0) {
 
@@ -968,6 +983,11 @@ const initAlarmControls = () => {
 const renderAlarmsList = () => {
     let alarms = (appData.settings && appData.settings.alarms) || [];
     let naflAlarms = (appData.settings && appData.settings.naflAlarms) || [];
+    let i18n = (appData && appData.i18n) || {};
+
+    /* The localized word ("Alarms") is filled from the class-based i18n pass
+       (runApp / applyLatestI18n); here we only keep the (N) count current. */
+    $('#alarmsCount').text('(' + (alarms.length + naflAlarms.length) + ')');
 
     let day = new Date(new Date().toLocaleString('en-US', { timeZone: appData.settings.timeZoneID })).getDay();
     let isWeekDay = day > 0 && day < 6;
@@ -975,7 +995,6 @@ const renderAlarmsList = () => {
     let html = '';
 
     if (alarms.length === 0 && naflAlarms.length === 0) {
-        let i18n = (appData && appData.i18n) || {};
         let noAlarms = i18n.noAlarmsText || 'No alarms set.';
         let note = i18n.alarmsNoteText || 'Alarms always play, even when adhan calls are off.';
         let bulb = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#d4af37" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>';
@@ -1075,6 +1094,7 @@ const saveAlarmsAndRefresh = () => {
     chrome.storage.local.set({ 'appData': appData }, function () {
         goGoRun('alarms updated');
         renderAlarmsList();
+        showAlarmList();
         $(':focus').blur();
     });
 };

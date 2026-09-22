@@ -198,5 +198,13 @@
   "naflTabText": {
     "message": "Alarm Nafl",
     "description": "Nafl (voluntary prayer) alarm tab title (shown after a + )"
+  },
+  "alarmsHeaderText": {
+    "message": "Alarm",
+    "description": "Alarm page header: the Alarms list title, shown with a count e.g. Alarms (2)"
+  },
+  "addAlarmText": {
+    "message": "Tambah",
+    "description": "Alarm page button that opens the add-alarm form"
   }
 }

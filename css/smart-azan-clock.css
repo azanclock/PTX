@@ -227,7 +227,76 @@ body {
 
 #alarms-tab {
     gap: 0;
+    margin-bottom: 0;
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+/* View toggle for the alarm page. #alarmListView carries Bootstrap's
+   .d-flex (display:flex !important), so a plain jQuery .hide() (inline
+   display:none) is ignored; this !important class (loaded after Bootstrap)
+   wins, so we toggle it instead of using .hide()/.show(). */
+.alarm-hidden {
+    display: none !important;
+}
+
+/* List-view header: "Alarms (N)" on the start side, the round + Add button on
+   the end side. */
+.alarms-header-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: whitesmoke;
+}
+
+.alarm-add-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+    border: 0;
+    background-color: #d4af37;
+    color: #212529;
+    font-weight: 700;
+    font-size: 0.8rem;
+    line-height: 1;
+    border-radius: 20px;
+    padding: 5px 14px;
+    cursor: pointer;
+}
+
+.alarm-add-btn:hover {
+    background-color: #dcbb4f;
+}
+
+.alarm-add-btn .alarm-add-plus {
+    font-size: 1rem;
+    line-height: 1;
+}
+
+/* Form-view header row: back button + the Alarm / Nafl type selector. */
+.alarm-form-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
     margin-bottom: 8px;
+}
+
+.alarm-back-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border: 0;
+    background-color: #31373E;
+    color: #9aa0a6;
+    border-radius: 20px;
+    padding: 5px 11px;
+    cursor: pointer;
+}
+
+.alarm-back-btn:hover {
+    color: whitesmoke;
+    background-color: #3b424a;
 }
 
 /* Segmented look matching the icon-style selector: joined buttons,
