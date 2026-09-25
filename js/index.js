@@ -1639,12 +1639,12 @@ function quranManageTicker(playing) {
 }
 
 /* green Qur'an play/pause toggle in the header (every tab): pause icon while playing, play icon otherwise.
-   Also gilds the book menu icon's lines (#menu-div-quran) while audio plays. */
+   Also swaps the menu icon (#menu-div-quran) to quran-playing.svg (green rehal stand) while audio plays. */
 function quranUpdateHeaderToggle(playing) {
     const btn = document.getElementById('quranHeaderToggle');
     if (btn) btn.classList.toggle('playing', !!playing);
-    const menu = document.getElementById('menu-div-quran');
-    if (menu) menu.classList.toggle('playing', !!playing);
+    const icon = document.querySelector('#menu-div-quran .quran-menu-icon');
+    if (icon) icon.src = playing ? 'images/quran-playing.svg' : 'images/quran.svg';
 }
 
 /* Qur'an playback streams every surah from a CDN, so with no internet the feature can't

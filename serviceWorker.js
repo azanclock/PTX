@@ -692,6 +692,21 @@ function showNotification(id, title, message) {
     });
 }
 
+/* The popup calls run() every second; clearing and re-setting the badge on each run made it
+   visibly flicker. Only touch the badge when its text or color actually changes. */
+let lastBadgeText = null;
+let lastBadgeColor = null;
+function setBadge(text, color) {
+    if (text !== lastBadgeText) {
+        chrome.action.setBadgeText({ 'text': text });
+        lastBadgeText = text;
+    }
+    if (text && color !== lastBadgeColor) {
+        chrome.action.setBadgeBackgroundColor({ 'color': color });
+        lastBadgeColor = color;
+    }
+}
+
 function extensionOps() {
 
     let isRamadan = false;
@@ -757,8 +772,6 @@ function extensionOps() {
     if (nextText.length < 4)
         nextText = ' ' + nextText + ' ';
 
-    chrome.action.setBadgeText({ 'text': '' });
-
     if (adhanStatus.isBeingCalled) {
         /* An adhan or alarm is calling: the whole toolbar icon becomes red pause bars — the same
            treatment as the green Qur'an icon below, but red to match the red stop-adhan button
@@ -766,8 +779,7 @@ function extensionOps() {
            open the popup and stop it). Checked before quranPlaying because an adhan pauses the
            Qur'an; the prayer countdown stays in Chrome's native corner badge as usual. */
         chrome.action.setIcon({ imageData: { [iconSize]: pauseIconData(ADHAN_RED) } });
-        chrome.action.setBadgeText({ 'text': nextText });
-        chrome.action.setBadgeBackgroundColor({ 'color': badgeBackgroundColor });
+        setBadge(nextText, badgeBackgroundColor);
     }
     else if (quranPlaying) {
         /* Qur'an is playing: the whole toolbar icon becomes green pause bars so it's obvious where
@@ -776,15 +788,14 @@ function extensionOps() {
            into a 16px icon — so both icon styles still show the time while playing. The badge keeps
            the normal badge background (dark gray, or tomato in the last hour) for consistency. */
         chrome.action.setIcon({ imageData: { [iconSize]: pauseIconData(QURAN_GREEN) } });
-        chrome.action.setBadgeText({ 'text': nextText });
-        chrome.action.setBadgeBackgroundColor({ 'color': badgeBackgroundColor });
+        setBadge(nextText, badgeBackgroundColor);
     }
     else if (appData.settings.iconStyle === "badge") {
-        chrome.action.setBadgeText({ 'text': nextText });
-        chrome.action.setBadgeBackgroundColor({ 'color': badgeBackgroundColor });
+        setBadge(nextText, badgeBackgroundColor);
         chrome.action.setIcon({ imageData: { [iconSize]: btx.getImageData(0, 0, iconSize, iconSize) } });
     }
     else {
+        setBadge('', badgeBackgroundColor);
         chrome.action.setIcon({ imageData: { [iconSize]: itx.getImageData(0, 0, iconSize, iconSize) } });
     }
 
@@ -1253,10 +1264,25 @@ async function quranToggle() {
         chrome.runtime.sendMessage({ quranPause: true }).catch(() => { });
     } else {
         quranErrorStreak = 0;
+        await quranStopAdhanForPlay();   /* pressing play during an adhan/alarm silences it and the Qur'an takes over */
         const surah = state.currentSurah || 1;
-        const time = Math.max(0, state.currentTime || 0);  /* manual pause → play resumes from the exact spot (no rewind) */
-        await quranPlayAt(surah, time);
+        /* manual pause → play resumes from the exact spot; if an adhan had paused it mid-recitation,
+           rewind a little for context just like the automatic resume does */
+        const rewind = state.wasPlayingBeforeAdhan ? QURAN_ADHAN_RESUME_REWIND : 0;
+        const time = Math.max(0, (state.currentTime || 0) - rewind);
+        await quranPlayAt(surah, time);   /* writes a fresh quranState, clearing wasPlayingBeforeAdhan */
     }
+}
+
+/* Stop a calling adhan/alarm without endAdhanCall()'s auto-resume (the caller is about to start
+   the Qur'an itself). quranPlayAt's isPlaying flip then repaints the icon from red to green. */
+async function quranStopAdhanForPlay() {
+    const r = await chrome.storage.local.get(['adhanStatus']);
+    if (!r.adhanStatus || !r.adhanStatus.isBeingCalled) return;
+    chrome.runtime.sendMessage({ stopAdhanCall: true }).catch(() => { });
+    adhanStatus = r.adhanStatus;
+    adhanStatus.isBeingCalled = false;
+    await chrome.storage.local.set({ 'adhanStatus': adhanStatus });
 }
 
 async function quranStep(delta) {
