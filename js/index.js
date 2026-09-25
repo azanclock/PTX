@@ -261,13 +261,6 @@ $(function () {
         quranCloseSurahPicker();
     });
 
-    $("#infoIcon").click(function (e) {
-        $('.menu-div').removeClass('bg-secondary');
-        $('.tabDiv').hide();
-        $('#infoTab').show();
-        $('#footer').hide();
-    });
-
     $('#calPrev').click(function () {
         calViewDate = new Date(calViewDate.getFullYear(), calViewDate.getMonth() - 1, 1);
         renderCalendar();
