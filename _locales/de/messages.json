@@ -1,6 +1,6 @@
 ﻿{
   "name": {
-    "message": "Gebetszeiten: Koran, Adhan, Alarme & Hidschri-Kalender",
+    "message": "Gebetszeiten & Koran",
     "description": ""
   },
   "short_name": {
@@ -8,7 +8,7 @@
     "description": ""
   },
   "description": {
-    "message": "Einfacher Zugriff auf Gebetszeiten und Anzeige der verbleibenden Zeit bis zum nächsten Gebet.",
+    "message": "Gebetszeiten mit Koran-Audio, Adhan, anpassbaren Weckern und einem Hidschri-Kalender.",
     "description": ""
   },
   "languageCode": {

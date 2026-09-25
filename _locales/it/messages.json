@@ -1,6 +1,6 @@
 ﻿{
   "name": {
-    "message": "Orari di preghiera: Corano, Adhan, allarmi e calendario Hijri",
+    "message": "Orari di preghiera e Corano",
     "description": ""
   },
   "short_name": {
@@ -8,7 +8,7 @@
     "description": ""
   },
   "description": {
-    "message": "Accedi facilmente ai tempi di preghiera e guarda quanto tempo manca alle prossime preghiere.",
+    "message": "Orari di preghiera con audio del Corano, Adhan, sveglie personalizzabili e un calendario Hijri.",
     "description": ""
   },
   "languageCode": {

@@ -1,6 +1,6 @@
 ﻿{
   "name": {
-    "message": "Namaz Vakitleri: Kur'an, Ezan, Alarmlar ve Hicri Takvim",
+    "message": "Namaz Vakitleri ve Kur'anı Kerim",
     "description": ""
   },
   "short_name": {
@@ -8,7 +8,7 @@
     "description": ""
   },
   "description": {
-    "message": "Namaz vakitlerine kolayca erişim sağlar ve bir sonraki vakte ne kadar kaldığını gösterir.",
+    "message": "Kur'an sesi, Ezan, özelleştirilebilir alarmlar ve Hicri Takvim ile namaz vakitleri.",
     "description": ""
   },
   "languageCode": {

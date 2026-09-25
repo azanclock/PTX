@@ -48,12 +48,24 @@
                             <img class="menu-img" src="images/calendar.svg" />
                         </div>
                         <div id="menu-div-quran" class="menu-div menu-quran pointerOn rounded">
-                            <svg class="menu-img quran-menu-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            <svg class="menu-img quran-menu-icon" xmlns="http://www.w3.org/2000/svg" viewBox="20 50 536 440"
+                                fill="none" stroke="currentColor" stroke-width="16" stroke-linecap="round"
                                 stroke-linejoin="round">
-                                <path d="M12 7v14" />
-                                <path
-                                    d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z" />
+                                <path d="M136 98 100 88 42 268 288 336 534 268 476 88 440 98" />
+                                <path d="M42 268v24l246 68 246-68v-24" />
+                                <path d="M142 70Q222 88 288 124 354 88 434 70L476 222Q370 238 288 296 206 238 100 222Z" />
+                                <path d="M288 124v172" />
+                                <path d="M100 222Q200 250 288 318 376 250 476 222" />
+                                <path d="M166 104 254 132 258 222Q210 196 150 188Z" stroke-width="10" />
+                                <path d="M410 104 322 132 318 222Q366 196 426 188Z" stroke-width="10" />
+                                <path d="M176 128l62 18M174 144l66 19M172 160l68 20M170 176l70 21" stroke-width="8" />
+                                <path d="M400 128l-62 18M402 144l-66 19M404 160l-68 20M406 176l-70 21" stroke-width="8" />
+                                <path d="M274 340v18M302 340v18" />
+                                <circle cx="288" cy="378" r="15" />
+                                <path d="M76 312 52 446 270 380M500 312 524 446 306 380" />
+                                <path d="M90 326 72 424 250 372ZM486 326 504 424 326 372Z" fill="currentColor" stroke-width="6" />
+                                <path d="M52 446 40 470 276 398M524 446 536 470 300 398" />
+                                <path class="q-flip" d="M288 124Q354 88 434 70L476 222Q370 238 288 296Z" stroke-width="12" />
                             </svg>
                         </div>
                         <button id="quranHeaderToggle" type="button" class="quran-header-toggle"
@@ -64,8 +76,9 @@
                                     d="M6 5h4v14H6zM14 5h4v14h-4z" /></svg></button>
                     </div>
 
-                    <div id="stopAdhanDiv" class="pointerOn rounded" style="background-color: #F20031; display:none;">
-                        <img class="menu-img" src="images/pause.svg" />
+                    <div id="stopAdhanDiv" class="pointerOn" style="display:none;">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path
+                                d="M6 5h4v14H6zM14 5h4v14h-4z" /></svg>
                     </div>
 
                     <div class="d-flex flex-row align-items-center justify-content-end gap-1">
@@ -222,7 +235,7 @@
                     </div>
                 </div>
 
-                <div id="adhanOffsetSettings" class="tabDiv text-start h-100 pb-3" style="display:none;">
+                <div id="adhanOffsetSettings" class="tabDiv text-start h-100 pb-2" style="display:none;">
 
                     <div class="d-flex flex-column h-100 justify-content-between" style="overflow: hidden;">
 
@@ -311,7 +324,7 @@
 
                         <div class="flex-shrink-0 d-flex align-items-center justify-content-between mb-2">
                             <div class="alarms-header-title"><span class="alarmsHeaderText">Alarms</span> <span id="alarmsCount">(0)</span></div>
-                            <button id="showAlarmFormBtn" type="button" class="alarm-add-btn"><span class="alarm-add-plus">+</span> <span class="addAlarmText">Add</span></button>
+                            <button id="showAlarmFormBtn" type="button" class="btn btn-xs alarm-add-btn"><span class="alarm-add-plus">+</span> <span class="addAlarmText">Add</span></button>
                         </div>
 
                         <div id="alarmsList" class="flex-grow-1 csb pe-1" style="overflow-y:auto; min-height:0;"></div>
@@ -509,25 +522,36 @@
 
                     <div id="quranCongrats" class="quran-congrats-overlay" style="display:none;">
                         <div class="quran-congrats-inner">
-                            <div class="quran-congrats-emblem" aria-hidden="true">
-                                <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                            <div class="quran-congrats-ornament" aria-hidden="true">
+                                <svg viewBox="0 0 64 72" xmlns="http://www.w3.org/2000/svg">
                                     <defs>
-                                        <linearGradient id="quranGoldStar" x1="0" y1="0" x2="0" y2="1">
+                                        <linearGradient id="quranGoldArch" x1="0" y1="0" x2="0" y2="1">
                                             <stop offset="0" stop-color="#fdeeb8" />
                                             <stop offset="0.55" stop-color="#e7cf86" />
                                             <stop offset="1" stop-color="#d4af37" />
                                         </linearGradient>
                                     </defs>
-                                    <path fill="url(#quranGoldStar)"
-                                        d="M 32 3 L 36.78 20.45 L 52.51 11.49 L 43.55 27.22 L 61 32 L 43.55 36.78 L 52.51 52.51 L 36.78 43.55 L 32 61 L 27.22 43.55 L 11.49 52.51 L 20.45 36.78 L 3 32 L 20.45 27.22 L 11.49 11.49 L 27.22 20.45 Z" />
-                                    <circle cx="32" cy="32" r="9" fill="none" stroke="#8a6d1f"
-                                        stroke-width="1.5" opacity="0.5" />
+                                    <!-- pointed mihrab arch: gold band between the outer and inner arch -->
+                                    <path fill="url(#quranGoldArch)" fill-rule="evenodd" stroke="#8a6d1f" stroke-width="1"
+                                        stroke-linejoin="round"
+                                        d="M11 67V35C11 21 21 12 32 3C43 12 53 21 53 35V67ZM18 67V36C18 26 25 18 32 11C39 18 46 26 46 36V67Z" />
+                                    <!-- plinth -->
+                                    <rect x="7" y="66" width="50" height="4" rx="1" fill="url(#quranGoldArch)" stroke="#8a6d1f"
+                                        stroke-width="1" />
+                                    <!-- hanging lamp -->
+                                    <path d="M32 11V27" stroke="#c2a86a" stroke-width="1" />
+                                    <path d="M26 30H38L35.5 37H28.5Z" fill="url(#quranGoldArch)" />
+                                    <path d="M29.5 37H34.5L32 41Z" fill="#d4af37" />
                                 </svg>
                             </div>
                             <div class="quran-congrats-flourish" aria-hidden="true">
                                 <span class="quran-congrats-diamond"></span>
                             </div>
                             <div id="quranCongratsText" class="quran-congrats-text"></div>
+                            <div class="quran-congrats-dua csb" dir="rtl" lang="ar">
+                                <p>الحمد لله رب العالمين، والصلاة والسلام على سيدنا محمد وعلى آله وصحبه أجمعين. واعفُ عنا واغفر لنا وارحمنا، أنت مولانا وأنت أرحم الراحمين، أنت مولانا وأنت أكرم الأكرمين، أنت مولانا وأنت أرحم الراحمين، أنت مولانا فانصرنا على القوم الكافرين.</p>
+                                <p>اللهم إنا نسألك رحمةً من عندك تهدّئ بها روعنا، وتلمّ بها شعثنا، وتجمع بها شملنا، وتشفي بها مرضانا، وتزكّي بها أعمالنا، وتلهمنا بها رشدنا، يا جامع الناس. اللهم اجمع أمة محمد على نور هدايتك يا جامع</p>
+                            </div>
                             <button id="quranKhatmReset" type="button" class="quran-congrats-reset"></button>
                         </div>
                     </div>

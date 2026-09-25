@@ -1,6 +1,6 @@
 ﻿{
   "name": {
-    "message": "Waktu Sholat: Al-Quran, Azan, Alarm & Kalender Hijriah",
+    "message": "Waktu Sholat & Al-Quran",
     "description": ""
   },
   "short_name": {
@@ -8,7 +8,7 @@
     "description": ""
   },
   "description": {
-    "message": "Akses waktu salat dengan mudah dan lihat berapa lama lagi hingga salat berikutnya.",
+    "message": "Waktu sholat dengan audio Al-Quran, Azan, alarm yang dapat disesuaikan, dan kalender Hijriah.",
     "description": ""
   },
   "languageCode": {

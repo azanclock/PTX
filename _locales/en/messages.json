@@ -1,6 +1,6 @@
 ﻿{
   "name": {
-    "message": "Muslim Prayer Times: Quran, Adhan, Alarms & Hijri Calendar",
+    "message": "Prayer Times & Quran",
     "description": ""
   },
   "short_name": {
@@ -8,7 +8,7 @@
     "description": ""
   },
   "description": {
-    "message": "Easily access prayer times and see how much time is left until next prayers.",
+    "message": "Prayer times with Quran audio, Adhan, customizable alarms, and a Hijri calendar.",
     "description": ""
   },
   "languageCode": {

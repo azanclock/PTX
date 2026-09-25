@@ -1,6 +1,6 @@
 ﻿{
   "name": {
-    "message": "Bönetider: Koran, Adhan, larm & Hijri-kalender",
+    "message": "Bönetider & Koran",
     "description": ""
   },
   "short_name": {
@@ -8,7 +8,7 @@
     "description": ""
   },
   "description": {
-    "message": "Lättåtkomliga bönetider och överblick på resterande tid innan nästa bön",
+    "message": "Bönetider med Koran-ljud, Adhan, anpassningsbara alarm och en Hijri-kalender.",
     "description": ""
   },
   "defaultMethod": {

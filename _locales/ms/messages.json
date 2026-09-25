@@ -1,6 +1,6 @@
 ﻿{
   "name": {
-    "message": "Waktu Solat: Al-Quran, Azan, Penggera & Kalendar Hijrah",
+    "message": "Waktu Solat & Al-Quran",
     "description": ""
   },
   "short_name": {
@@ -8,7 +8,7 @@
     "description": ""
   },
   "description": {
-    "message": "Akses waktu solat dengan mudah dan lihat berapa lama lagi sehingga solat seterusnya.",
+    "message": "Waktu solat dengan audio Al-Quran, Azan, penggera boleh suai, dan kalendar Hijrah.",
     "description": ""
   },
   "languageCode": {

@@ -1,6 +1,6 @@
 ﻿{
   "name": {
-    "message": "Godziny modlitwy: Koran, Azan, alarmy i kalendarz Hidżri",
+    "message": "Godziny modlitwy i Koran",
     "description": ""
   },
   "short_name": {
@@ -8,7 +8,7 @@
     "description": ""
   },
   "description": {
-    "message": "Łatwy dostęp do czasu modlitwy i zobaczyć, ile czasu pozostało do następnych modlitw.",
+    "message": "Godziny modlitwy z audio Koranu, Azanem, konfigurowalnymi alarmami i kalendarzem Hidżri.",
     "description": ""
   },
   "languageCode": {

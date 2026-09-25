@@ -1,6 +1,6 @@
 ﻿{
   "name": {
-    "message": "기도 시간: 꾸란, 아잔, 알람 및 히즈리 달력",
+    "message": "기도 시간 및 꾸란",
     "description": ""
   },
   "short_name": {
@@ -8,7 +8,7 @@
     "description": ""
   },
   "description": {
-    "message": "기도 시간에 쉽게 접속하고 다음 기도 시간이 얼마나 남은지 확인.",
+    "message": "꾸란 오디오, 아잔, 맞춤형 알람, 히즈리 달력을 갖춘 기도 시간.",
     "description": ""
   },
   "languageCode": {

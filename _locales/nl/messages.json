@@ -1,6 +1,6 @@
 ﻿{
   "name": {
-    "message": "Gebedstijden: Koran, Adhan, alarmen & Hijri-kalender",
+    "message": "Gebedstijden & Koran",
     "description": ""
   },
   "short_name": {
@@ -8,7 +8,7 @@
     "description": ""
   },
   "description": {
-    "message": "Krijg eenvoudig toegang tot gebedstijden en zie hoeveel tijd er nog is tot de volgende gebeden.",
+    "message": "Gebedstijden met Koran-audio, Adhan, aanpasbare alarmen en een Hijri-kalender.",
     "description": ""
   },
   "languageCode": {

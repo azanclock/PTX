@@ -1,6 +1,6 @@
 ﻿{
   "name": {
-    "message": "Thời gian cầu nguyện: Kinh Qur'an, Azan, báo thức & lịch Hijri",
+    "message": "Thời gian cầu nguyện & Kinh Qur'an",
     "description": ""
   },
   "short_name": {
@@ -8,7 +8,7 @@
     "description": ""
   },
   "description": {
-    "message": "Dễ dàng truy cập thời gian cầu nguyện và xem còn bao lâu nữa cho đến những lần cầu nguyện tiếp theo.",
+    "message": "Thời gian cầu nguyện với âm thanh Kinh Qur'an, Azan, báo thức tùy chỉnh và lịch Hijri.",
     "description": ""
   },
   "languageCode": {

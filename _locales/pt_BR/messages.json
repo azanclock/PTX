@@ -1,6 +1,6 @@
 ﻿{
   "name": {
-    "message": "Horários de oração: Alcorão, Adhan, alarmes e calendário Hijri",
+    "message": "Horários de oração e Alcorão",
     "description": ""
   },
   "short_name": {
@@ -8,7 +8,7 @@
     "description": ""
   },
   "description": {
-    "message": "Acesse facilmente os horários de oração e veja quanto tempo resta até as próximas orações.",
+    "message": "Horários de oração com áudio do Alcorão, Adhan, alarmes personalizáveis e um calendário Hijri.",
     "description": ""
   },
   "languageCode": {

@@ -514,8 +514,9 @@ $(function () {
 
 document.addEventListener('click', function (event) {
 
-    if (event.target && event.target.classList.contains('playAudioButton')) {
-        playAudio(appData.settings.adhans[event.target.dataset.vakit]);
+    const playBtn = event.target && event.target.closest && event.target.closest('.playAudioButton');
+    if (playBtn) {
+        playAudio(appData.settings.adhans[playBtn.dataset.vakit]);
     }
 
     if (event.target && event.target.classList.contains('adhanRecitorBtn')) {
@@ -587,13 +588,17 @@ const setFields = async () => {
     if (adhanStatus.isBeingCalled)
         $('#stopAdhanDiv').show();
 
+    /* the adhan and Qur'an share the offscreen audio, so hide the header Qur'an play/pause
+       toggle while an adhan is being called (the red stop-adhan button takes its place) */
+    $('#quranHeaderToggle').toggleClass('adhan-hidden', !!adhanStatus.isBeingCalled);
+
     let hasAlarms = (appData.settings.alarms && appData.settings.alarms.length) || (appData.settings.naflAlarms && appData.settings.naflAlarms.length);
     $('#alarmMenuIcon').attr('src', hasAlarms ? 'images/alarm-active.svg' : 'images/alarm.svg');
 
     if (!$('#basicSettings').is(':visible'))
         $('#address').val(appData.settings.address);
 
-    let topAddressMaxLen = 14;
+    let topAddressMaxLen = 10;
     let topAddress = appData.settings.address.substring(0, topAddressMaxLen).trimEnd() + ((appData.settings.address.length > topAddressMaxLen) ? '…' : '');
     $('#addressMenuText').html(topAddress);
     $('.timeNowTitle').html(appData.timeNow).attr('title', 'Current Time in ' + appData.settings.timeZoneID);
@@ -788,7 +793,7 @@ const displayAdhansAndOffsets = () => {
         if (appData.settings.adhans.hasOwnProperty(v)) {
 
             aoContent += `<div class="adhanRow" id="adhanRow${v}" style="display:none;">`
-            aoContent += `<div class="d-flex flex-row gap-1 mt-2 px-1 justify-content-between align-items-center">`
+            aoContent += `<div class="d-flex flex-row gap-1 mt-1 px-1 justify-content-between align-items-center">`
             aoContent += `<div class="flex-fill">`
             aoContent += `<select class="form-control form-control-sm adhanDD" 
                                 data-name="${v}">
@@ -806,7 +811,10 @@ const displayAdhansAndOffsets = () => {
             aoContent += "</select>";
             aoContent += "</div>";
 
-            aoContent += `<div><img src="images/play.png" class="playAudioButton pointer p-1 rounded" data-vakit="${v}" data-title="${thisAudioTitle}" /></div>`;
+            aoContent += `<div><button type="button" class="playAudioButton${audioPlayer.paused ? '' : ' playing'}" data-vakit="${v}" data-title="${thisAudioTitle}">`
+                + `<svg class="aicon aplay" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>`
+                + `<svg class="aicon apause" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h4v14H6zM14 5h4v14h-4z" /></svg>`
+                + `</button></div>`;
 
             aoContent += '</div>';
             aoContent += '</div>';
@@ -858,7 +866,7 @@ const displayAdhansAndOffsets = () => {
 const playAudio = (id) => {
     audioPlayer.src = '/adhans/' + id + '.mp3';
     audioPlayer.volume = appData.settings.volume / 10;
-    $('.playAudioButton').attr('src', '/images/pause.svg');
+    $('.playAudioButton').addClass('playing');
     audioPlayer.play();
     $('#audioPlayerDiv').show();
 }
@@ -866,7 +874,7 @@ const playAudio = (id) => {
 const stopAudio = () => {
     audioPlayer.pause();
     audioPlayer.currentTime = 0;
-    $('.playAudioButton').attr('src', '/images/play.png');
+    $('.playAudioButton').removeClass('playing');
     $('#audioPlayerDiv').hide();
 }
 
@@ -1631,7 +1639,7 @@ function quranManageTicker(playing) {
 }
 
 /* green Qur'an play/pause toggle in the header (every tab): pause icon while playing, play icon otherwise.
-   Also greens the book menu icon's lines (#menu-div-quran) while audio plays. */
+   Also gilds the book menu icon's lines (#menu-div-quran) while audio plays. */
 function quranUpdateHeaderToggle(playing) {
     const btn = document.getElementById('quranHeaderToggle');
     if (btn) btn.classList.toggle('playing', !!playing);

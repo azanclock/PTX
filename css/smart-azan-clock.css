@@ -25,7 +25,7 @@ body {
 }
 
 #topCard {
-    width: 359px;
+    width: 340px;
     height: 579px;
 }
 
@@ -68,8 +68,11 @@ body {
 }
 
 /* Qur'an book menu icon: whitesmoke strokes normally, green lines while audio plays
-   (#menu-div-quran gets .playing from quranUpdateHeaderToggle) */
+   (#menu-div-quran gets .playing from quranUpdateHeaderToggle); the wide, edge-to-edge
+   viewBox would otherwise stretch it past the other header icons, so pin a square box */
 .quran-menu-icon {
+    width: 30px;
+    padding: 4px;
     color: whitesmoke;
     transition: color 0.12s ease;
 }
@@ -78,11 +81,41 @@ body {
     color: #22c55e;
 }
 
+/* Page turn while playing: .q-flip is a copy of the right page's outline, mirrored
+   across the spine (its bbox's left edge) so it lands exactly on the left page */
+.quran-menu-icon .q-flip {
+    opacity: 0;
+    transform-box: fill-box;
+    transform-origin: 0 50%;
+}
+
+#menu-div-quran.playing .q-flip {
+    animation: quranPageFlip 30s linear infinite;   /* one ~1.2s turn every 30s */
+}
+
+@keyframes quranPageFlip {
+    0%   { transform: scaleX(1);  opacity: 0; animation-timing-function: ease-in-out; }
+    0.6% { transform: scaleX(1);  opacity: 1; animation-timing-function: ease-in-out; }
+    4%   { transform: scaleX(-1); opacity: 1; }
+    5%, 100% { transform: scaleX(-1); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #menu-div-quran.playing .q-flip {
+        animation: none;
+    }
+}
+
 /* Qur'an playback streams audio from a CDN, so the whole feature is useless with no
    connection: the menu icon (#menu-div-quran) and the header play/pause toggle
    (#quranHeaderToggle) get this class while the device is offline (see
    quranUpdateConnectivity in js/index.js) */
 .quran-offline-hidden {
+    display: none !important;
+}
+
+/* header Qur'an toggle is hidden while an adhan is being called (setFields in js/index.js) */
+.adhan-hidden {
     display: none !important;
 }
 
@@ -133,6 +166,72 @@ body {
 }
 
 .quran-header-toggle.playing .qpause {
+    display: inline;
+}
+
+/* red stop-adhan button in the header: same 22px circle + 11px pause glyph as the
+   Qur'an toggle it replaces while an adhan is being called */
+#stopAdhanDiv {
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background-color: #F20031;
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#stopAdhanDiv:hover {
+    background-color: #c80028;
+}
+
+#stopAdhanDiv svg {
+    width: 11px;
+    height: 11px;
+}
+
+/* adhan preview button in the adhan settings rows: green play circle, red pause circle
+   (.playing, set by playAudio/stopAudio) - same 22px / 11px icon as the header buttons */
+.playAudioButton {
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background-color: #198754;
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.playAudioButton:hover {
+    background-color: #157347;
+}
+
+.playAudioButton.playing {
+    background-color: #F20031;
+}
+
+.playAudioButton.playing:hover {
+    background-color: #c80028;
+}
+
+.playAudioButton .aicon {
+    width: 11px;
+    height: 11px;
+}
+
+.playAudioButton .apause,
+.playAudioButton.playing .aplay {
+    display: none;
+}
+
+.playAudioButton.playing .apause {
     display: inline;
 }
 
@@ -248,29 +347,25 @@ body {
     color: whitesmoke;
 }
 
+/* Add button: the offsets tab's btn btn-xs shape, in the alarm gold accent
+   (same colors as #addAlarmButton / the active Alarm tab) */
 .alarm-add-btn {
     display: inline-flex;
     align-items: center;
     gap: 4px;
     flex-shrink: 0;
-    border: 0;
-    background-color: #d4af37;
-    color: #212529;
-    font-weight: 700;
-    font-size: 0.8rem;
-    line-height: 1;
-    border-radius: 20px;
-    padding: 5px 14px;
-    cursor: pointer;
-}
-
-.alarm-add-btn:hover {
-    background-color: #dcbb4f;
-}
-
-.alarm-add-btn .alarm-add-plus {
-    font-size: 1rem;
-    line-height: 1;
+    padding: 2px 10px;
+    font-size: 14px;
+    --bs-btn-color: #000;
+    --bs-btn-bg: #ffc107;
+    --bs-btn-border-color: #ffc107;
+    --bs-btn-hover-color: #000;
+    --bs-btn-hover-bg: #ffca2c;
+    --bs-btn-hover-border-color: #ffca2c;
+    --bs-btn-active-color: #000;
+    --bs-btn-active-bg: #ffca2c;
+    --bs-btn-active-border-color: #ffca2c;
+    --bs-btn-focus-shadow-rgb: 255, 193, 7;
 }
 
 /* Form-view header row: back button + the Alarm / Nafl type selector. */
@@ -327,12 +422,12 @@ body {
 }
 
 #alarms-tab #add-alarm-tab.active {
-    color: #212529;
-    background-color: #d4af37;
+    color: #000;
+    background-color: #ffc107;
 }
 
 #alarms-tab #add-nafl-tab.active {
-    color: whitesmoke;
+    color: white;
     background-color: #5a9e7a;
 }
 
@@ -365,23 +460,23 @@ body {
     font-weight: 700;
 }
 
-/* Recolor the round + buttons off Bootstrap's loud btn-warning/btn-success
-   to the alarm/nafl accents (soft gold / sage green). ID specificity wins
+/* Recolor the round + buttons to the alarm/nafl accents (gold #ffc107 /
+   sage green). ID specificity wins
    over the .btn-* classes; the shadow var tames the focus glow to match. */
 #addAlarmButton {
-    color: #212529;
-    background-color: #d4af37;
-    border-color: #d4af37;
-    --bs-btn-focus-shadow-rgb: 212, 175, 55;
+    color: #000;
+    background-color: #ffc107;
+    border-color: #ffc107;
+    --bs-btn-focus-shadow-rgb: 255, 193, 7;
 }
 
 #addAlarmButton:hover {
-    background-color: #dcbb4f;
-    border-color: #dcbb4f;
+    background-color: #ffca2c;
+    border-color: #ffca2c;
 }
 
 #addNaflButton {
-    color: whitesmoke;
+    color: white;
     background-color: #5a9e7a;
     border-color: #5a9e7a;
     --bs-btn-focus-shadow-rgb: 90, 158, 122;
@@ -1580,8 +1675,8 @@ body {
     align-items: center;
     justify-content: center;
     text-align: center;
-    padding: 24px 22px;
-    /* opaque manuscript backdrop with a soft gold halo behind the emblem */
+    padding: 16px 18px;
+    /* opaque manuscript backdrop with a soft gold halo behind the congrats line */
     background:
         radial-gradient(120% 60% at 50% 34%, rgba(212, 175, 55, 0.16), transparent 60%),
         #1b1e21;
@@ -1591,33 +1686,28 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 15px;
+    gap: 11px;
     max-width: 300px;
+    max-height: 100%;     /* lets the dua box shrink + scroll instead of overflowing the card */
+    min-height: 0;
 }
 
-.quran-congrats-emblem {
-    width: 92px;
-    height: 92px;
-    filter: drop-shadow(0 3px 11px rgba(212, 175, 55, 0.4));
-    animation: quranEmblemIn 0.6s ease both;
+/* mihrab arch with a hanging lamp, in warm gold */
+.quran-congrats-ornament {
+    flex-shrink: 0;
+    width: 52px;
+    height: 58px;
+    filter: drop-shadow(0 3px 10px rgba(212, 175, 55, 0.35));
 }
 
-.quran-congrats-emblem svg {
+.quran-congrats-ornament svg {
     display: block;
     width: 100%;
     height: 100%;
 }
 
-@keyframes quranEmblemIn {
-    from { opacity: 0; transform: scale(0.55) rotate(-30deg); }
-    to   { opacity: 1; transform: none; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .quran-congrats-emblem { animation: none; }
-}
-
-/* gold rule with a small centered diamond — echoes the surah-caption flourish */
+/* gold rule with a small centered diamond between the ornament and the congrats line — echoes
+   the surah-caption flourish */
 .quran-congrats-flourish {
     display: flex;
     align-items: center;
@@ -1658,7 +1748,33 @@ body {
     color: #e7cf86;   /* fallback where background-clip:text is unsupported */
 }
 
+/* khatm dua (Arabic, same text in every UI language) under the congrats line; scrolls when it
+   doesn't fit the card */
+.quran-congrats-dua {
+    flex: 0 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 8px 12px;
+    border: 1px solid rgba(194, 168, 106, 0.35);
+    border-radius: 8px;
+    background: rgba(212, 175, 55, 0.05);
+    font-family: 'Amiri', 'Scheherazade New', 'Al Bayan', 'Geeza Pro', 'Noto Naskh Arabic', serif;
+    font-size: 16px;
+    line-height: 1.85;
+    color: #efe3c2;
+    text-align: center;
+}
+
+.quran-congrats-dua p {
+    margin: 0;
+}
+
+.quran-congrats-dua p + p {
+    margin-top: 6px;
+}
+
 .quran-congrats-reset {
+    flex-shrink: 0;
     margin-top: 4px;
     background: linear-gradient(180deg, #e7cf86 0%, #d4af37 100%);
     border: 0;
@@ -1724,6 +1840,7 @@ body {
 .quran-picker-list {
     flex: 1 1 auto;
     overflow-y: auto;
+    overflow-x: hidden;   /* rows never scroll sideways; long names ellipsize instead */
     min-height: 0;
 }
 
@@ -1901,7 +2018,7 @@ body {
     top: -8px;
     bottom: -8px;
     left: -11px;     /* covers the whole gap back to the Arabic name (main undershoot direction) */
-    right: -12px;
+    right: -4px;     /* only as far as the row's right padding — any further overflows the list sideways */
 }
 
 .quran-srow-check svg {

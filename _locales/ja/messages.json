@@ -1,6 +1,6 @@
 ﻿{
   "name": {
-    "message": "お祈り時間・コーラン・アザーン・アラーム・ヒジュラ暦",
+    "message": "お祈り時間・コーラン",
     "description": ""
   },
   "short_name": {
@@ -8,7 +8,7 @@
     "description": ""
   },
   "description": {
-    "message": "容易にお祈り時間をご覧になり、次のお祈りまで何時間が残っているか、をご存知になることができます。",
+    "message": "お祈り時間、コーランの音声、アザーン、カスタマイズ可能なアラーム、そしてヒジュラ暦。",
     "description": ""
   },
   "languageCode": {
