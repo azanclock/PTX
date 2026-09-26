@@ -1019,7 +1019,9 @@ function markAlarms(canvas, r) {
 
             let addMinutes = a.when === 'before' ? -a.minutes : a.minutes;
             let naflTime = addMinutesToTime(base, addMinutes);
-            drawIndicator(canvas, markerRadius, timeToRadians(naflTime, 12), '#198754');
+            /* Nafl alarms ring every day (see checkAlarms), so apply the same 12h window. */
+            if (minutesUntilNextAlarm({ time: naflTime, frequency: 'E' }) <= 720)
+                drawIndicator(canvas, markerRadius, timeToRadians(naflTime, 12), '#198754');
         });
     }
 }
