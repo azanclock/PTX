@@ -1814,6 +1814,7 @@ body {
 .quran-srow-name {
     flex: 1 1 auto;
     min-width: 0;
+    text-align: right;
     font-size: 13px;
     font-weight: 600;
     color: #e9ecef;
@@ -1822,10 +1823,12 @@ body {
     white-space: nowrap;
 }
 
+/* fixed width (fits the widest name, Al-'Imran ~73px at 14px) so the right-aligned English names
+   and the Arabic names each share one edge down the list */
 .quran-srow-ar {
-    flex-shrink: 0;
+    flex: 0 0 76px;
     max-width: 38%;
-    font-size: 12px;
+    font-size: 14px;
     color: #8a9199;
     direction: rtl;
     overflow: hidden;
@@ -1872,9 +1875,13 @@ body {
     color: #fff;
 }
 
-/* prostration marker in a surah row — the plain ۩ (Arial/Helvetica), soft gold, not Amiri */
+/* prostration marker in a surah row — the plain ۩ (Arial/Helvetica), soft gold, not Amiri.
+   Fixed-width column just before the check (the slot is present, empty, on every row) so the
+   marks line up regardless of how long each Arabic name is. */
 .quran-srow-sajda {
     flex-shrink: 0;
+    width: 18px;
+    text-align: center;
     font-family: 'Arial', 'Helvetica Neue', 'Helvetica', 'Segoe UI', sans-serif;
     font-size: 18px;
     line-height: 1;

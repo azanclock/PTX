@@ -1491,17 +1491,18 @@ function quranBuildPickers() {
     const check = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"'
         + ' stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
     const hasSajda = (typeof quranSajdaSurahs !== 'undefined') ? quranSajdaSurahs : new Set();
+    /* every row gets the fixed-width slot (empty when no sajdah) so the ۩ marks line up in a column */
     const sajdaMark = (n) => hasSajda.has(n)
         ? '<span class="quran-srow-sajda" title="' + calEsc(quranT('sajdaTip')) + '" aria-label="'
           + calEsc(quranT('sajdaTip')) + '">۩</span>'
-        : '';
+        : '<span class="quran-srow-sajda" aria-hidden="true"></span>';
     const sbox = document.getElementById('quranSurahList');
     if (sbox) sbox.innerHTML = surahs.map(s =>
         '<div class="quran-srow" data-surah="' + s.number + '">'
         + '<span class="quran-srow-num">' + s.number + '</span>'
         + '<span class="quran-srow-name">' + calEsc(s.englishName) + '</span>'
-        + sajdaMark(s.number)
         + '<span class="quran-srow-ar">' + calEsc(s.name) + '</span>'
+        + sajdaMark(s.number)
         + '<button type="button" class="quran-srow-check" data-surah="' + s.number + '" aria-label="'
         + calEsc(quranT('markCompleted')) + '">' + check + '</button>'
         + '</div>').join('');
