@@ -255,27 +255,6 @@ body {
     cursor: pointer;
 }
 
-.alarm-dot,
-.gray-dot,
-.nafl-alarm-dot {
-    width: 9px;
-    height: 9px;
-    border-radius: 50%;
-    display: inline-block;
-}
-
-.alarm-dot {
-    background-color: #d4af37;
-}
-
-.gray-dot {
-    background-color: gray;
-}
-
-.nafl-alarm-dot {
-    background-color: #5a9e7a;
-}
-
 .alarm-tip {
     background-color: rgba(212, 175, 55, 0.1);
     border-inline-start: 3px solid #d4af37;
@@ -311,7 +290,7 @@ body {
 /* List-view header: "Alarms (N)" on the start side, the round + Add button on
    the end side. */
 .alarms-header-title {
-    font-size: 0.95rem;
+    font-size: 0.8rem;
     font-weight: 700;
     color: whitesmoke;
 }
@@ -460,20 +439,85 @@ body {
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     background-color: #2a2f34;
     border-radius: 6px;
-    padding: 6px 8px;
+    padding: 6px;
     margin-bottom: 5px;
     text-align: start;
+    transition: background-color 0.15s;
 }
 
-.alarm-item-icon {
+.alarm-item:hover {
+    background-color: #353c43;
+}
+
+/* Highlighted time column on each alarm card: "Everyday" caption over a big
+   "9:30am", or a single "Asr−15" line for nafl alarms. Fixed line heights +
+   min-height keep one-line nafl cards as tall as two-line alarm cards. */
+.alarm-time {
     flex-shrink: 0;
-    width: 17px;
+    width: 95px;
+    min-height: 42px;
     display: flex;
-    align-items: center;
+    flex-direction: column;
     justify-content: center;
+    padding: 3px 2px;
+    border-radius: 5px;
+    text-align: center;
+    line-height: 1.15;
+    color: #ffc107;
+    background-color: rgba(255, 193, 7, 0.14);
+    border: 1px solid rgba(255, 193, 7, 0.5);
+}
+
+.alarm-time.nafl-time {
+    color: #7fd6a4;
+    background-color: rgba(90, 158, 122, 0.2);
+    border-color: rgba(104, 172, 136, 0.6);
+}
+
+.alarm-time.alarm-time-off {
+    color: #b0b6bc;
+    background-color: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+.alarm-time-sub {
+    font-size: 11px;
+    line-height: 13px;
+    color: #d6dadd;
+}
+
+.alarm-time-off .alarm-time-sub {
+    color: #8a9096;
+}
+
+.alarm-time-main {
+    font-size: 16px;
+    line-height: 19px;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+}
+
+/* Nafl line ("Asr−15"): smaller, with the offset in the same font and size
+   as the prayer name. */
+.nafl-time .alarm-time-main {
+    font-size: 14px;
+    line-height: 17px;
+}
+
+.nafl-time .alarm-time-ap {
+    font-size: inherit;
+    font-weight: inherit;
+    white-space: nowrap;
+    margin-inline-start: 0;
+}
+
+.alarm-time-ap {
+    font-size: 11px;
+    font-weight: 600;
+    margin-inline-start: 1px;
 }
 
 .alarm-item-info {
@@ -482,37 +526,39 @@ body {
 }
 
 .alarm-item-name {
-    font-size: 13px;
+    font-size: 11.5px;
     font-weight: 600;
     color: whitesmoke;
-    line-height: 1.2;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    line-height: 1.25;
+    overflow-wrap: anywhere;
 }
 
-.alarm-item-schedule {
-    font-size: 15px;
-    color: #9aa0a6;
-    line-height: 1.3;
-    margin-top: 2px;
-}
-
+/* Round remove button at the end of the row: muted gray, red on hover. */
 .alarm-item-remove {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    flex-shrink: 0;
+    padding: 0;
     border: 0;
-    background-color: #dc3545;
-    color: whitesmoke;
-    border-radius: 10px;
-    padding: 3px 9px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #b0b6bc;
     cursor: pointer;
+    transition: background-color 0.15s, color 0.15s;
 }
 
-.alarm-item-remove:hover {
-    background-color: #bb2d3b;
+.alarm-item-remove svg {
+    width: 8px;
+    height: 8px;
+}
+
+.alarm-item-remove:hover,
+.alarm-item-remove:focus-visible {
+    background-color: #dc3545;
+    color: white;
 }
 
 #loading {

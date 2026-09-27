@@ -1009,29 +1009,53 @@ const renderAlarmsList = () => {
                 </div>`;
     }
 
-    alarms.forEach((a, index) => {
-        let name = adhanAudios.find(x => x.id == a.id)?.name ?? '';
-        let active = (a.frequency === 'E') || (a.frequency === 'W' && isWeekDay);
-        html += alarmCard(active ? 'alarm-dot' : 'gray-dot', name,
-            `${a.frequency === 'W' ? 'Weekdays' : 'Everyday'} at ${a.hour}:${a.minute}${a.ap}`, 'alarm', index);
-    });
+    /* Shown in time order (nafl: prayer order, then chronologically around the
+       prayer). Stored order is untouched; each card keeps its storage index
+       for removal. */
+    const alarmMinutes = a => (a.hour % 12 + (a.ap === 'pm' ? 12 : 0)) * 60 + a.minute * 1;
+    const naflRank = a => naflVakits.findIndex(v => v.value === a.vakit) * 1000
+        + (a.when === 'after' ? 1 : -1) * a.minutes;
 
-    naflAlarms.forEach((a, index) => {
-        let name = adhanAudios.find(x => x.id == a.id)?.name ?? '';
-        html += alarmCard('nafl-alarm-dot', name,
-            `${a.minutes} min${a.minutes > 1 ? 's' : ''} ${a.when} ${a.vakit}`, 'nafl', index);
-    });
+    alarms.map((a, index) => ({ a, index }))
+        .sort((x, y) => alarmMinutes(x.a) - alarmMinutes(y.a))
+        .forEach(({ a, index }) => {
+            let name = adhanAudios.find(x => x.id == a.id)?.name ?? '';
+            let active = (a.frequency === 'E') || (a.frequency === 'W' && isWeekDay);
+            let freq = a.frequency === 'W' ? (i18n.weekdaysText || 'Weekdays') : (i18n.everydayText || 'Everyday');
+            html += alarmCard(active ? 'alarm-time' : 'alarm-time alarm-time-off', name,
+                `<div class="alarm-time-sub">${freq}</div>
+                 <div class="alarm-time-main">${a.hour}:${a.minute}<span class="alarm-time-ap">${a.ap}</span></div>`,
+                'alarm', index);
+        });
+
+    naflAlarms.map((a, index) => ({ a, index }))
+        .sort((x, y) => naflRank(x.a) - naflRank(y.a))
+        .forEach(({ a, index }) => {
+            let name = adhanAudios.find(x => x.id == a.id)?.name ?? '';
+            let when = a.when === 'after' ? (i18n.afterText || 'after') : (i18n.beforeText || 'before');
+            let vakit = naflVakits.find(v => v.value === a.vakit);
+            let vakitName = (vakit && i18n[vakit.i18n]) || a.vakit;
+            /* Compact "Asr−15" / "Asr+15"; the spelled-out form is the tooltip. */
+            html += alarmCard('alarm-time nafl-time', name,
+                `<div class="alarm-time-main">${vakitName}<span class="alarm-time-ap">${a.when === 'after' ? '+' : '\u2212'}${a.minutes}</span></div>`,
+                'nafl', index, `${a.minutes} ${i18n.minText || 'min'} ${when} ${vakitName}`);
+        });
 
     $('#alarmsList').html(html);
 };
 
-const alarmCard = (dotClass, name, schedule, type, index) => {
+/* Card = [time column | sound name | remove]. The time column carries the
+   highlight: gold for alarms (gray when a weekday alarm is off today), green
+   for nafl alarms. */
+const alarmCard = (timeClass, name, timeHtml, type, index, timeTitle = '') => {
+    /* Sound names carry their length, e.g. "Bismillahirrahmanirrahim (0:05)";
+       the cards show the name only, without any "(...)" part. */
+    let title = name.replace(/\s*\([^)]*\)/g, '').trim();
     return `
         <div class="alarm-item">
-            <div class="alarm-item-icon"><span class="${dotClass}"></span></div>
+            <div class="${timeClass}"${timeTitle ? ` title="${timeTitle}"` : ''}>${timeHtml}</div>
             <div class="alarm-item-info">
-                <div class="alarm-item-name">${name}</div>
-                <div class="alarm-item-schedule">${schedule}</div>
+                <div class="alarm-item-name">${title}</div>
             </div>
             <button type="button" class="alarm-item-remove removeAlarmBtn"
                 data-type="${type}" data-index="${index}" aria-label="Remove"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
