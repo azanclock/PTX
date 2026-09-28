@@ -34,6 +34,9 @@ self.addEventListener('message', async (msg) => {
     else if ('quranStop' in msg.data) {
         await quranStopAll();
     }
+    else if ('quranPauseOnly' in msg.data) {   /* previewing an adhan sound in settings interrupts Qur'an playback */
+        await quranPauseOnly();
+    }
     else if ('quranSetVolume' in msg.data) {
         await quranSetVolume(msg.data.quranSetVolume);
     }
@@ -1360,6 +1363,19 @@ async function quranStopAll() {
 
 async function quranSetVolume(v) {
     chrome.runtime.sendMessage({ quranVolume: v }).catch(() => { });
+}
+
+/* Plain pause, no wasPlayingBeforeAdhan flag — unlike quranPauseForAdhan, nothing auto-resumes
+   this afterwards. Used when an adhan sound is previewed from settings; the two audio paths
+   (Qur'an via the offscreen doc, adhan preview via the popup's own <audio>) would otherwise
+   play over each other. */
+async function quranPauseOnly() {
+    const { state } = await quranGetContext();
+    if (state.isPlaying) {
+        state.isPlaying = false;
+        await quranSetState(state);
+        chrome.runtime.sendMessage({ quranPause: true }).catch(() => { });
+    }
 }
 
 async function quranPauseForAdhan() {

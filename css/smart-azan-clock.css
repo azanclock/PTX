@@ -103,7 +103,10 @@ body {
     gap: 1px;
 }
 
-/* green Qur'an play/pause toggle next to the Qur'an icon, on every tab */
+/* green Qur'an stop toggle next to the Qur'an icon, on every tab. It is a stop-only
+   control: hidden unless Qur'an audio is already playing (.playing, set by
+   quranUpdateHeaderToggle in js/index.js) so there is never a play button in the header —
+   starting playback requires opening the Qur'an tab first. */
 .quran-header-toggle {
     flex-shrink: 0;
     width: 22px;
@@ -114,10 +117,14 @@ body {
     border-radius: 50%;
     background-color: #198754;
     color: #fff;
-    display: inline-flex;
+    display: none;
     align-items: center;
     justify-content: center;
     cursor: pointer;
+}
+
+.quran-header-toggle.playing {
+    display: inline-flex;
 }
 
 .quran-header-toggle:hover {

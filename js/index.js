@@ -857,6 +857,7 @@ const displayAdhansAndOffsets = () => {
 }
 
 const playAudio = (id) => {
+    quranSend({ quranPauseOnly: true });   /* previewing an adhan sound stops Qur'an playback first */
     audioPlayer.src = '/adhans/' + id + '.mp3';
     audioPlayer.volume = appData.settings.volume / 10;
     $('.playAudioButton').addClass('playing');
@@ -1430,6 +1431,7 @@ const renderUpcomingHolydays = () => {
    picker overlays; the surah picker doubles as the completed-toggle list. */
 
 const quranSend = (msg) => {
+    if (!audioPlayer.paused) stopAudio();   /* using Qur'an controls stops an adhan preview playing in settings */
     if (navigator.serviceWorker.controller) navigator.serviceWorker.controller.postMessage(msg);
 };
 
@@ -1656,7 +1658,9 @@ function quranManageTicker(playing) {
     else if (!playing && quranTick) { clearInterval(quranTick); quranTick = null; }
 }
 
-/* green Qur'an play/pause toggle in the header (every tab): pause icon while playing, play icon otherwise.
+/* green Qur'an stop toggle in the header (every tab): stop-only, so it's hidden unless audio
+   is already playing (see .quran-header-toggle.playing in css/smart-azan-clock.css) — there is
+   no play button here, starting playback always goes through the Qur'an tab.
    Also swaps the menu icon (#menu-div-quran) to quran-playing.svg (green rehal stand) while audio plays. */
 function quranUpdateHeaderToggle(playing) {
     const btn = document.getElementById('quranHeaderToggle');
